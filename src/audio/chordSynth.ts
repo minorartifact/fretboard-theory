@@ -26,7 +26,7 @@ function getCtx(): AudioContext {
 }
 
 const DURATION_S = 2.6
-const ATTACK_S = 0.009
+const ATTACK_S = 0.005
 const RELEASE_S = 0.38
 
 /** Generate a Karplus-Strong plucked-string waveform into an AudioBuffer. */
@@ -133,7 +133,7 @@ export function playChord(rootPc: number, pattern: number[]): void {
       const freq = noteFreq(pc, octaveFor(i))
       // A little timing and velocity variation keeps repeated chords from
       // sounding like the exact same sample being retriggered.
-      const t0 = now + i * 0.034 + Math.random() * 0.009
+      const t0 = now + i * 0.026 + (i === 0 ? 0 : Math.random() * 0.004)
       const baseVol = i === 0 ? 0.38 : Math.max(0.19, 0.33 - i * 0.025)
       const vol = baseVol * (0.92 + Math.random() * 0.12)
       playBuffer(ac, generateKS(ac, freq), freq, t0, vol)
