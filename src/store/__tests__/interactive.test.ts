@@ -88,3 +88,27 @@ describe('interactive store — interval selection', () => {
     expect(s().anchor).toBeNull()
   })
 })
+
+describe('interactive store — clear selection', () => {
+  beforeEach(reset)
+
+  it('clears transient fretboard selections without changing mode or position', () => {
+    useInteractiveStore.setState({
+      hoverPc: 5,
+      posIdx: 2,
+      mode: 'intervals',
+      pinned: [note(1, 3)],
+      selectedIntervals: [3, 7],
+      anchor: note(2, 5),
+    })
+
+    useInteractiveStore.getState().clearSelection()
+    const state = useInteractiveStore.getState()
+    expect(state.hoverPc).toBeNull()
+    expect(state.pinned).toEqual([])
+    expect(state.selectedIntervals).toEqual([])
+    expect(state.anchor).toBeNull()
+    expect(state.mode).toBe('intervals')
+    expect(state.posIdx).toBe(2)
+  })
+})

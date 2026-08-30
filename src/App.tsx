@@ -14,6 +14,7 @@ import { useTheoryStore } from './store/theory'
 import { useProgressionStore } from './store/progression'
 import { useFretboardStore } from './store/fretboard'
 import { useViewStore } from './store/view'
+import { useInteractiveStore } from './store/interactive'
 import { getPitchName } from './theory/pitch'
 import { CHORD_QUALITIES_BY_ID } from './theory/chords'
 import { resolveProgression } from './theory/progression'
@@ -136,6 +137,15 @@ function App() {
   const sidebarOpen     = useViewStore(s => s.sidebarOpen)
   const closeSidebar    = useViewStore(s => s.closeSidebar)
   const narrow          = useMediaQuery(NARROW)
+  const clearFretboardSelection = useInteractiveStore(s => s.clearSelection)
+
+  const handleWorkspacePointerDown = (event: React.PointerEvent<HTMLElement>) => {
+    const target = event.target as Element
+    const isInteractive = target.closest(
+      'button, input, textarea, select, [role="button"], [contenteditable="true"]',
+    )
+    if (!isInteractive) clearFretboardSelection()
+  }
 
   // On a narrow screen the sidebar overlays the neck instead of taking a column.
   const sidebarVisible = !fullscreen && (!narrow || sidebarOpen)
@@ -162,7 +172,10 @@ function App() {
           : <TheoryPanel />
       )}
 
-      <main style={{ flex: 1, display: 'flex', flexDirection: 'column', minWidth: 0, overflow: 'hidden' }}>
+      <main
+        onPointerDown={handleWorkspacePointerDown}
+        style={{ flex: 1, display: 'flex', flexDirection: 'column', minWidth: 0, overflow: 'hidden' }}
+      >
         {!fullscreen && (
           <>
             <MainHeader narrow={narrow} />

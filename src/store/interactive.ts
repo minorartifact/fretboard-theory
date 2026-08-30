@@ -42,6 +42,7 @@ interface InteractiveActions {
   toggleInterval: (semi: number)            => void
   clearIntervals: ()                        => void
   setAnchor:      (note: PinnedNote | null) => void
+  clearSelection: ()                        => void
 }
 
 export const useInteractiveStore = create<InteractiveState & InteractiveActions>(set => ({
@@ -61,6 +62,12 @@ export const useInteractiveStore = create<InteractiveState & InteractiveActions>
   setMode: mode => set({ mode, pinned: [] }),
 
   clearIntervals: () => set({ selectedIntervals: [], anchor: null }),
+  clearSelection: () => set({
+    hoverPc: null,
+    pinned: [],
+    selectedIntervals: [],
+    anchor: null,
+  }),
 
   toggleInterval: semi => set(s => ({
     selectedIntervals: s.selectedIntervals.includes(semi)
