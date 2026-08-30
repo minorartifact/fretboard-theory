@@ -1,4 +1,4 @@
-# Fretboard Theory
+# Neckwise
 
 An interactive music-theory visualizer for guitarists. Explore scales, chord tones, intervals, voicings, and progressions directly on the fretboard.
 
