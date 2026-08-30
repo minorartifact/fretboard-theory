@@ -1,0 +1,95 @@
+import { useMemo } from 'react'
+import { useTheoryStore } from '../../store/theory'
+import { useInteractiveStore } from '../../store/interactive'
+import { useProgressionStore } from '../../store/progression'
+import { getPitchName } from '../../theory/pitch'
+import { CHORD_QUALITIES_BY_ID } from '../../theory/chords'
+import { resolveProgression } from '../../theory/progression'
+import { degreeFill, degreeTextColor } from './colors'
+import type { Chord, PitchClass } from '../../theory/types'
+
+const CHORD_ROLE_COLORS = ['#e0564f', '#cbb02e', '#3897d6', '#c23bb6', '#8888aa']
+
+export function NoteChips() {
+  const root           = useTheoryStore(s => s.root)
+  const scale          = useTheoryStore(s => s.scale)
+  const chordQualityId = useTheoryStore(s => s.chordQualityId)
+  const progSteps      = useProgressionStore(s => s.steps)
+  const activeStep     = useProgressionStore(s => s.activeStep)
+  const selectedIntervals = useInteractiveStore(s => s.selectedIntervals)
+  const toggleInterval    = useInteractiveStore(s => s.toggleInterval)
+
+  const activeChord: Chord | null = useMemo(() => {
+    if (!scale) return null
+    if (activeStep != null && progSteps.length > 0) {
+      try {
+        const resolved = resolveProgression(root, scale, { steps: progSteps })
+        const c = resolved[activeStep]
+        if (c) return c
+      } catch { /* resolveProgression throws for non-diatonic scales */ }
+    }
+    if (chordQualityId) {
+      const q = CHORD_QUALITIES_BY_ID[chordQualityId]
+      if (q) return { root, quality: q }
+    }
+    return null
+  }, [root, scale, chordQualityId, progSteps, activeStep])
+
+  if (!scale) return null
+
+  const chordActive = activeChord !== null
+
+  return (
+    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', alignItems: 'center' }}>
+      <span style={{ fontSize: '10.5px', fontWeight: 700, letterSpacing: '.16em', textTransform: 'uppercase', color: '#6b6258', marginRight: '4px' }}>
+        Notes
+      </span>
+      {scale.pattern.map((semitones, i) => {
+        const pc       = ((root + semitones) % 12) as PitchClass
+        const degLabel = scale.degrees[i]
+        const noteName = getPitchName(pc, 'auto', root)
+
+        let chipColor = degreeFill(degLabel)
+        let opacity   = 1
+
+        if (chordActive && activeChord) {
+          const offset   = (pc - activeChord.root + 12) % 12
+          const chordIdx = activeChord.quality.pattern.indexOf(offset)
+          if (chordIdx >= 0) {
+            chipColor = CHORD_ROLE_COLORS[Math.min(chordIdx, CHORD_ROLE_COLORS.length - 1)]
+          } else {
+            opacity = 0.32
+          }
+        }
+
+        const selected = selectedIntervals.includes(semitones)
+        const shortcut = i < 9 ? String(i + 1) : null
+
+        return (
+          <button
+            key={i}
+            onClick={() => toggleInterval(semitones)}
+            title={shortcut
+              ? `${noteName} · degree ${degLabel} — click or press ${shortcut} to highlight`
+              : `${noteName} · degree ${degLabel} — click to highlight`}
+            style={{
+              display: 'inline-flex', alignItems: 'center', gap: '6px',
+              padding: '5px 12px', borderRadius: '999px',
+              background: chipColor,
+              color: chordActive ? '#fff' : degreeTextColor(degLabel),
+              fontFamily: "'JetBrains Mono', monospace",
+              fontWeight: 700, fontSize: '14px',
+              opacity, cursor: 'pointer',
+              outline: selected ? '2px solid #f1ebe2' : '2px solid transparent',
+              outlineOffset: '2px',
+              transition: 'opacity .15s, outline-color .12s',
+            }}
+          >
+            <span>{noteName}</span>
+            <span style={{ fontSize: '10px', opacity: 0.72, fontWeight: 600 }}>{degLabel}</span>
+          </button>
+        )
+      })}
+    </div>
+  )
+}
