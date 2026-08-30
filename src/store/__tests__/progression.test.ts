@@ -10,7 +10,7 @@ const s = () => useProgressionStore.getState()
 const reset = (steps: ProgressionStep[] = []) => {
   useProgressionStore.setState({
     steps, activeStep: steps.length ? 0 : null, hoveredStep: null,
-    beatIndex: 0, playing: false, bpm: 100, loop: true,
+    beatIndex: 0, playing: false, bpm: 100, loop: true, metronome: false,
   })
 }
 
@@ -103,6 +103,14 @@ describe('progression store — transport', () => {
     expect(s().bpm).toBe(220)
     s().setBpm(1)
     expect(s().bpm).toBe(40)
+  })
+
+  it('toggles the metronome independently of playback', () => {
+    s().toggleMetronome()
+    expect(s().metronome).toBe(true)
+    expect(s().playing).toBe(false)
+    s().toggleMetronome()
+    expect(s().metronome).toBe(false)
   })
 
   it('refuses to play an empty progression', () => {

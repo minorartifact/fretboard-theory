@@ -58,7 +58,7 @@ export function deserializeSteps(raw: unknown): ProgressionStep[] {
 
 const STORAGE_KEY = 'ftp.v1'
 
-function load(): Partial<{ steps: ProgressionStep[]; activeStep: number | null; bpm: number; loop: boolean }> {
+function load(): Partial<{ steps: ProgressionStep[]; activeStep: number | null; bpm: number; loop: boolean; metronome: boolean }> {
   try {
     const raw = localStorage.getItem(STORAGE_KEY)
     if (!raw) return {}
@@ -68,17 +68,19 @@ function load(): Partial<{ steps: ProgressionStep[]; activeStep: number | null; 
       activeStep: typeof d.activeStep === 'number' ? d.activeStep : null,
       bpm:        typeof d.bpm  === 'number'  ? Math.max(40, Math.min(220, d.bpm)) : 100,
       loop:       typeof d.loop === 'boolean' ? d.loop : true,
+      metronome:  typeof d.metronome === 'boolean' ? d.metronome : false,
     }
   } catch { return {} }
 }
 
-function save(s: { steps: ProgressionStep[]; activeStep: number | null; bpm: number; loop: boolean }) {
+function save(s: { steps: ProgressionStep[]; activeStep: number | null; bpm: number; loop: boolean; metronome: boolean }) {
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify({
       steps:      serializeSteps(s.steps),
       activeStep: s.activeStep,
       bpm:        s.bpm,
       loop:       s.loop,
+      metronome:  s.metronome,
     }))
   } catch { /* localStorage may be unavailable in private browsing */ }
 }
@@ -93,6 +95,7 @@ interface ProgressionState {
   playing:     boolean
   bpm:         number
   loop:        boolean
+  metronome:   boolean
   /** Steps removed by the last `clear()`, so it can be undone. */
   lastCleared: ProgressionStep[] | null
 }
@@ -114,6 +117,7 @@ interface ProgressionActions {
   restart:    () => void
   setBpm:     (bpm: number) => void
   toggleLoop: () => void
+  toggleMetronome: () => void
 
   /** Resolve steps against the current theory-store state. */
   resolved:    () => Chord[]
@@ -162,6 +166,7 @@ export const useProgressionStore = create<ProgressionState & ProgressionActions>
       playing:     false,
       bpm:         persisted.bpm        ?? 100,
       loop:        persisted.loop       ?? true,
+      metronome:   persisted.metronome  ?? false,
       lastCleared: null,
 
       append: (degree, qualityId) =>
@@ -258,6 +263,7 @@ export const useProgressionStore = create<ProgressionState & ProgressionActions>
       },
 
       toggleLoop: () => set(s => ({ loop: !s.loop })),
+      toggleMetronome: () => set(s => ({ metronome: !s.metronome })),
 
       resolved: () => {
         const { root, scale } = useTheoryStore.getState()
@@ -277,7 +283,13 @@ export const useProgressionStore = create<ProgressionState & ProgressionActions>
 
 // Auto-persist on every state change
 useProgressionStore.subscribe(state => {
-  save({ steps: state.steps, activeStep: state.activeStep, bpm: state.bpm, loop: state.loop })
+  save({
+    steps: state.steps,
+    activeStep: state.activeStep,
+    bpm: state.bpm,
+    loop: state.loop,
+    metronome: state.metronome,
+  })
 })
 
 export { COMMON_PROGRESSIONS }

@@ -1,6 +1,7 @@
 import { useMemo } from 'react'
 import { useShareUrl } from './hooks/useShareUrl'
 import { useProgressionAudio } from './hooks/useProgressionAudio'
+import { useMetronomeAudio } from './hooks/useMetronomeAudio'
 import { useKeyboardShortcuts } from './hooks/useKeyboardShortcuts'
 import { useMediaQuery, NARROW } from './hooks/useMediaQuery'
 import { FretboardView } from './components/fretboard/FretboardView'
@@ -127,6 +128,7 @@ function CollapsedProgressionBar() {
 function App() {
   useShareUrl()
   useProgressionAudio()
+  useMetronomeAudio()
   useKeyboardShortcuts()
 
   const fullscreen      = useViewStore(s => s.fullscreen)

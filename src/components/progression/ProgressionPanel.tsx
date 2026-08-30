@@ -30,6 +30,7 @@ export function ProgressionPanel() {
   const playing    = useProgressionStore(s => s.playing)
   const bpm        = useProgressionStore(s => s.bpm)
   const loop       = useProgressionStore(s => s.loop)
+  const metronome  = useProgressionStore(s => s.metronome)
   const fullscreen = useViewStore(s => s.fullscreen)
   const toggleProgression = useViewStore(s => s.toggleProgression)
   const append         = useProgressionStore(s => s.append)
@@ -47,6 +48,7 @@ export function ProgressionPanel() {
   const restart    = useProgressionStore(s => s.restart)
   const setBpm     = useProgressionStore(s => s.setBpm)
   const toggleLoop = useProgressionStore(s => s.toggleLoop)
+  const toggleMetronome = useProgressionStore(s => s.toggleMetronome)
   const loadPreset = useProgressionStore(s => s.loadPreset)
 
   const [editCursor, setEditCursor] = useState<number | 'new'>('new')
@@ -289,6 +291,21 @@ export function ProgressionPanel() {
             >
               &#x21BB;
             </button>
+            <button
+              onClick={toggleMetronome}
+              title={metronome ? 'Metronome: on' : 'Metronome: off'}
+              aria-pressed={metronome}
+              className="h-icon"
+              style={{
+                ...BTN,
+                color: metronome ? '#e0a85a' : '#6b6258',
+                background: metronome ? 'rgba(224,168,90,.12)' : '#1b150f',
+                border: `1px solid ${metronome ? 'rgba(224,168,90,.4)' : '#2a221b'}`,
+                fontSize: '12px', fontWeight: 800,
+              }}
+            >
+              M
+            </button>
             {/* BPM control */}
             <div style={{ display: 'flex', alignItems: 'center', gap: '2px', marginLeft: '4px', background: '#1b150f', border: '1px solid #2a221b', borderRadius: '8px', padding: '0 3px' }}>
               <button onClick={() => setBpm(bpm - 5)} title="Decrease BPM" className="h-ghost" style={{ width: '20px', height: '26px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '15px', color: '#8a7f72', background: 'transparent', border: 'none', cursor: 'pointer', fontFamily: 'inherit', transition: 'color .12s' }}>&#x2212;</button>
@@ -453,4 +470,3 @@ export function ProgressionPanel() {
 }
 
 // ── Jam View ────────────────────────────────────────────────────────────────
-

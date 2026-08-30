@@ -22,12 +22,14 @@ export function ProgressionCards({ handleStepClick }: Props) {
   const playing    = useProgressionStore(s => s.playing)
   const bpm        = useProgressionStore(s => s.bpm)
   const loop       = useProgressionStore(s => s.loop)
+  const metronome  = useProgressionStore(s => s.metronome)
   const hoverStep  = useProgressionStore(s => s.hoverStep)
   const removeAt   = useProgressionStore(s => s.removeAt)
   const restart    = useProgressionStore(s => s.restart)
   const stepBy     = useProgressionStore(s => s.stepBy)
   const toggle     = useProgressionStore(s => s.toggle)
   const toggleLoop = useProgressionStore(s => s.toggleLoop)
+  const toggleMetronome = useProgressionStore(s => s.toggleMetronome)
   const setBpm     = useProgressionStore(s => s.setBpm)
 
   const save = useSaveSong()
@@ -88,6 +90,21 @@ export function ProgressionCards({ handleStepClick }: Props) {
             style={{ ...BTN_JAM, color: loop ? '#e0a85a' : '#6b6258', background: loop ? 'rgba(224,168,90,.12)' : '#1b150f', border: `1px solid ${loop ? 'rgba(224,168,90,.4)' : '#2a221b'}`, fontSize: '14px' }}
           >
             &#x21BB;
+          </button>
+          <button
+            onClick={toggleMetronome}
+            title={metronome ? 'Metronome: on' : 'Metronome: off'}
+            aria-pressed={metronome}
+            className="h-icon"
+            style={{
+              ...BTN_JAM,
+              color: metronome ? '#e0a85a' : '#6b6258',
+              background: metronome ? 'rgba(224,168,90,.12)' : '#1b150f',
+              border: `1px solid ${metronome ? 'rgba(224,168,90,.4)' : '#2a221b'}`,
+              fontSize: '12px', fontWeight: 800,
+            }}
+          >
+            M
           </button>
           <div style={{ display: 'flex', alignItems: 'center', gap: '2px', marginLeft: '4px', background: '#1b150f', border: '1px solid #2a221b', borderRadius: '8px', padding: '0 3px' }}>
             <button onClick={() => setBpm(bpm - 5)} className="h-ghost" style={{ width: '20px', height: '26px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '15px', color: '#8a7f72', background: 'transparent', border: 'none', cursor: 'pointer', fontFamily: 'inherit', transition: 'color .12s' }}>&#x2212;</button>
