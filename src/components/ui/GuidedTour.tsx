@@ -55,6 +55,7 @@ const STEPS: TourStep[] = [
     target: 'modes', pad: 8,
     title: 'Four ways to work',
     body: 'Explore learns the shape, Identify names notes you play, Chords shows voicings, Intervals measures distance. Position crops the neck to one hand shape so you practise where you actually are.',
+    tip: 'The ⤢ at the end of that row — or just F — throws everything else away and leaves the neck, for when the theory starts feeling like homework.',
   },
   {
     target: 'board', pad: 12,
