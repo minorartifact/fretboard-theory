@@ -1,7 +1,7 @@
 import { useMemo } from 'react'
 import { useTheoryStore } from '../../store/theory'
 import { useInteractiveStore } from '../../store/interactive'
-import { useProgressionStore } from '../../store/progression'
+import { useProgressionStore, useDisplayedStep } from '../../store/progression'
 import { getPitchName } from '../../theory/pitch'
 import { CHORD_QUALITIES_BY_ID } from '../../theory/chords'
 import { resolveProgression } from '../../theory/progression'
@@ -15,16 +15,16 @@ export function NoteChips() {
   const scale          = useTheoryStore(s => s.scale)
   const chordQualityId = useTheoryStore(s => s.chordQualityId)
   const progSteps      = useProgressionStore(s => s.steps)
-  const activeStep     = useProgressionStore(s => s.activeStep)
+  const step           = useDisplayedStep()
   const selectedIntervals = useInteractiveStore(s => s.selectedIntervals)
   const toggleInterval    = useInteractiveStore(s => s.toggleInterval)
 
   const activeChord: Chord | null = useMemo(() => {
     if (!scale) return null
-    if (activeStep != null && progSteps.length > 0) {
+    if (step != null && progSteps.length > 0) {
       try {
         const resolved = resolveProgression(root, scale, { steps: progSteps })
-        const c = resolved[activeStep]
+        const c = resolved[step]
         if (c) return c
       } catch { /* resolveProgression throws for non-diatonic scales */ }
     }
@@ -33,7 +33,7 @@ export function NoteChips() {
       if (q) return { root, quality: q }
     }
     return null
-  }, [root, scale, chordQualityId, progSteps, activeStep])
+  }, [root, scale, chordQualityId, progSteps, step])
 
   if (!scale) return null
 

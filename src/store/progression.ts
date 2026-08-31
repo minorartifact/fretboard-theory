@@ -294,4 +294,18 @@ useProgressionStore.subscribe(state => {
   })
 })
 
+/**
+ * The step every surface should describe: hovering a step previews it, and with
+ * nothing hovered the neck, header, chips and circle all follow the playhead.
+ *
+ * This was written out inline at five call sites and three of them dropped the
+ * hover half, so the header could name one chord while the neck drew another.
+ * Derive it here, or the surfaces drift apart again.
+ */
+export const selectDisplayedStep = (s: ProgressionState): number | null =>
+  s.hoveredStep ?? s.activeStep
+
+export const useDisplayedStep = (): number | null =>
+  useProgressionStore(selectDisplayedStep)
+
 export { COMMON_PROGRESSIONS }

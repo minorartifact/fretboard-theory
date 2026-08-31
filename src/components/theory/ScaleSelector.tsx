@@ -36,6 +36,14 @@ export function ScaleSelector() {
             onChange={e => setQuery(e.target.value)}
             placeholder={`Filter ${SCALES.length} scales`}
             aria-label="Filter scales"
+            onKeyDown={e => {
+              // useKeyboardShortcuts ignores every key while a text field has
+              // focus, so before this field existed the shortcuts always worked.
+              // Without a way out, clicking here silently kills Space, F and 2-9
+              // and types them into the box instead.
+              if (e.key === 'Escape') { setQuery(''); e.currentTarget.blur() }
+              if (e.key === 'Enter')  e.currentTarget.blur()
+            }}
             style={{
               width: '100%', boxSizing: 'border-box',
               height: '30px', padding: '0 9px 0 24px',

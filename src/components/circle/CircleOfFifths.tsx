@@ -1,6 +1,6 @@
 import { useState, useMemo } from 'react'
 import { useTheoryStore } from '../../store/theory'
-import { useProgressionStore } from '../../store/progression'
+import { useProgressionStore, useDisplayedStep } from '../../store/progression'
 import { isInScale, getScaleDegreeLabel } from '../../theory/scales'
 import { resolveProgression } from '../../theory/progression'
 import { SHARP_NAMES, FLAT_NAMES, ROOT_PREFERS_SHARPS } from '../../theory/constants'
@@ -32,25 +32,25 @@ export function CircleOfFifths() {
   const [hoveredPc, setHoveredPc] = useState<number | null>(null)
 
   const progSteps  = useProgressionStore(s => s.steps)
-  const activeStep = useProgressionStore(s => s.activeStep)
+  const step       = useDisplayedStep()
 
   const pcs = mode === 'fifths' ? FIFTHS_PCS : THIRDS_PCS
 
   // Resolve active chord from progression
   const { chordRoot, chordPcs } = useMemo(() => {
-    if (activeStep == null || progSteps.length === 0 || !scale) {
+    if (step == null || progSteps.length === 0 || !scale) {
       return { chordRoot: null as PitchClass | null, chordPcs: new Set<number>() }
     }
     try {
       const resolved = resolveProgression(root, scale, { steps: progSteps })
-      const chord = resolved[activeStep]
+      const chord = resolved[step]
       if (!chord) return { chordRoot: null, chordPcs: new Set<number>() }
       const pcs = new Set(chord.quality.pattern.map(off => (chord.root + off) % 12))
       return { chordRoot: chord.root, chordPcs: pcs }
     } catch {
       return { chordRoot: null as PitchClass | null, chordPcs: new Set<number>() }
     }
-  }, [root, scale, progSteps, activeStep])
+  }, [root, scale, progSteps, step])
 
   const chordActive = chordRoot !== null
 

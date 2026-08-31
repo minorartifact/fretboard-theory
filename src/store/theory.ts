@@ -1,5 +1,5 @@
 import { create } from 'zustand'
-import { useInteractiveStore } from './interactive'
+import { invalidateForScaleChange } from './invalidation'
 import type { PitchClass } from '../theory/types'
 import type { ScaleDef } from '../theory/types'
 import { SCALES_BY_ID } from '../theory/scales'
@@ -24,12 +24,8 @@ export const useTheoryStore = create<TheoryState & TheoryActions>((set, get) => 
   setRoot:           root           => set({ root }),
   setChordQualityId: chordQualityId => set({ chordQualityId }),
 
-  // A degree selection is stored as semitones of the scale it was made in, so it
-  // is meaningless against a different one. Carrying it over used to leave the
-  // neck dimmed by intervals the chips no longer showed, which read as the
-  // fretboard ignoring the scale change entirely.
   setScale: scale => {
-    if (get().scale?.id !== scale?.id) useInteractiveStore.getState().clearIntervals()
+    if (get().scale?.id !== scale?.id) invalidateForScaleChange()
     set({ scale })
   },
 }))

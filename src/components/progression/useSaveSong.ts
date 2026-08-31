@@ -2,8 +2,8 @@ import { useState, useRef } from 'react'
 import { useSongsStore } from '../../store/songs'
 
 /**
- * Save-progression-as-song form state. The normal and jam views are never
- * mounted at the same time, so each owns its own instance.
+ * Save-progression-as-song form state. The panel renders a different layout in
+ * fullscreen, and the two are never mounted together, so each owns an instance.
  */
 export function useSaveSong() {
   const saveSong = useSongsStore(s => s.saveSong)

@@ -13,7 +13,7 @@ import { NeckMenus } from './components/ui/NeckMenus'
 import { KeyStrip } from './components/theory/KeyStrip'
 import { ShortcutsOverlay } from './components/ui/ShortcutsOverlay'
 import { useTheoryStore } from './store/theory'
-import { useProgressionStore } from './store/progression'
+import { useProgressionStore, useDisplayedStep } from './store/progression'
 import { useViewStore } from './store/view'
 import { useInteractiveStore } from './store/interactive'
 import { getPitchName } from './theory/pitch'
@@ -26,16 +26,16 @@ function MainHeader({ narrow }: { narrow: boolean }) {
   const scale          = useTheoryStore(s => s.scale)
   const chordQualityId = useTheoryStore(s => s.chordQualityId)
   const progSteps      = useProgressionStore(s => s.steps)
-  const activeStep     = useProgressionStore(s => s.activeStep)
+  const step           = useDisplayedStep()
 
   const rootName = getPitchName(root, 'auto', root)
 
   // Derive active chord name — progression takes precedence
   const chordName = useMemo(() => {
-    if (activeStep != null && progSteps.length > 0 && scale) {
+    if (step != null && progSteps.length > 0 && scale) {
       try {
         const resolved = resolveProgression(root, scale, { steps: progSteps })
-        const c = resolved[activeStep]
+        const c = resolved[step]
         if (c) return getPitchName(c.root, 'auto', c.root) + c.quality.symbol
       } catch { /* resolveProgression can throw for non-diatonic scales */ }
     }
@@ -44,7 +44,7 @@ function MainHeader({ narrow }: { narrow: boolean }) {
       if (q) return rootName + q.symbol
     }
     return null
-  }, [root, scale, chordQualityId, progSteps, activeStep, rootName])
+  }, [root, scale, chordQualityId, progSteps, step, rootName])
 
   const headline = chordName ?? (scale?.name ?? 'No scale')
   const sub      = chordName

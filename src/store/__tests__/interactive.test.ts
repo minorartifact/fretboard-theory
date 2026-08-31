@@ -26,6 +26,28 @@ describe('interactive store — modes', () => {
     expect(useInteractiveStore.getState().pinned).toHaveLength(0)
   })
 
+  it('switching mode drops the interval selection and anchor', () => {
+    const s = () => useInteractiveStore.getState()
+    s().setMode('intervals')
+    s().toggleInterval(4)
+    s().setAnchor(note(2, 5))
+    expect(s().selectedIntervals).toEqual([4])
+
+    // Explore forces the anchor back to the root, so the same selection would
+    // light a different set of notes with nothing announcing the change.
+    s().setMode('explore')
+    expect(s().selectedIntervals).toEqual([])
+    expect(s().anchor).toBeNull()
+  })
+
+  it('re-selecting the current mode keeps the selection', () => {
+    const s = () => useInteractiveStore.getState()
+    s().setMode('explore')
+    s().toggleInterval(7)
+    s().setMode('explore')
+    expect(s().selectedIntervals).toEqual([7])
+  })
+
   it('modes are exclusive — setting one replaces the other', () => {
     useInteractiveStore.getState().setMode('identify')
     useInteractiveStore.getState().setMode('intervals')

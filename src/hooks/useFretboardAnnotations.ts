@@ -2,7 +2,7 @@ import { useMemo, useEffect, useState } from 'react'
 import { useTheoryStore } from '../store/theory'
 import { useFretboardStore } from '../store/fretboard'
 import { useViewStore } from '../store/view'
-import { useProgressionStore } from '../store/progression'
+import { useProgressionStore, useDisplayedStep } from '../store/progression'
 import { useInteractiveStore } from '../store/interactive'
 import { buildFretboardGrid } from '../theory/fretboard'
 import { annotateGrid } from '../theory/annotation'
@@ -20,8 +20,7 @@ export function useFretboardAnnotations(): {
   const scale          = useTheoryStore(s => s.scale)
   const chordQualityId = useTheoryStore(s => s.chordQualityId)
   const progSteps      = useProgressionStore(s => s.steps)
-  const hoveredStep    = useProgressionStore(s => s.hoveredStep)
-  const activeStep     = useProgressionStore(s => s.activeStep)
+  const step           = useDisplayedStep()
   const tuning         = useFretboardStore(s => s.tuning)
   const fretCount      = useFretboardStore(s => s.fretCount)
   const startFret      = useFretboardStore(s => s.startFret)
@@ -39,8 +38,6 @@ export function useFretboardAnnotations(): {
   }, [voicingMode, dbReady])
 
   return useMemo(() => {
-    // Hovering a step previews it; otherwise the neck follows the playhead.
-    const step = hoveredStep ?? activeStep
     let chord: Chord | null = null
     if (step != null && progSteps.length > 0 && scale) {
       try {
@@ -73,5 +70,5 @@ export function useFretboardAnnotations(): {
       : []
 
     return { annotations, voicings }
-  }, [root, scale, chordQualityId, progSteps, hoveredStep, activeStep, tuning, fretCount, startFret, labelMode, voicingMode, dbReady])
+  }, [root, scale, chordQualityId, progSteps, step, tuning, fretCount, startFret, labelMode, voicingMode, dbReady])
 }

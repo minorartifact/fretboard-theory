@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
-import { useProgressionStore, serializeSteps, deserializeSteps } from '../progression'
+import { useProgressionStore, serializeSteps, deserializeSteps, selectDisplayedStep } from '../progression'
 import { useTheoryStore } from '../theory'
 import { SCALES_BY_ID } from '../../theory/scales'
 import { CHORD_QUALITIES_BY_ID } from '../../theory/chords'
@@ -212,5 +212,35 @@ describe('progression store — persistence', () => {
     s().toggleMetronome()
     expect(stored().bpm).toBe(140)
     expect(stored().metronome).toBe(true)
+  })
+})
+
+describe('selectDisplayedStep', () => {
+  beforeEach(() => reset(degrees(3)))
+
+  const displayed = () => selectDisplayedStep(useProgressionStore.getState())
+
+  it('prefers a hovered step over the playhead', () => {
+    s().focusStep(0)
+    s().hoverStep(2)
+    expect(displayed()).toBe(2)
+  })
+
+  it('falls back to the playhead when nothing is hovered', () => {
+    s().focusStep(1)
+    s().hoverStep(null)
+    expect(displayed()).toBe(1)
+  })
+
+  it('is null when neither is set', () => {
+    s().focusStep(null)
+    s().hoverStep(null)
+    expect(displayed()).toBeNull()
+  })
+
+  it('honours a hovered step 0 rather than treating it as absent', () => {
+    s().focusStep(2)
+    s().hoverStep(0)
+    expect(displayed()).toBe(0)
   })
 })

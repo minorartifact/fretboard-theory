@@ -58,8 +58,15 @@ export const useInteractiveStore = create<InteractiveState & InteractiveActions>
   clearPins:  ()   => set({ pinned: [] }),
   setAnchor:  note => set({ anchor: note }),
 
-  // Pins only mean something inside identify mode.
-  setMode: mode => set({ mode, pinned: [] }),
+  // Modes are exclusive, so none of them should inherit the last one's marks.
+  // Pins only mean something inside identify mode, and an interval selection
+  // only means something against its anchor — carried into explore, where the
+  // anchor is forced back to the root, the same selection lights different
+  // notes without anything saying so. Re-selecting the current mode is a no-op
+  // rather than a reset.
+  setMode: mode => set(s => s.mode === mode
+    ? {}
+    : { mode, pinned: [], selectedIntervals: [], anchor: null }),
 
   clearIntervals: () => set({ selectedIntervals: [], anchor: null }),
   clearSelection: () => set({

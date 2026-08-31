@@ -2,6 +2,7 @@ import { useInteractiveStore, POSITIONS, type FretboardMode } from '../../store/
 import { useViewStore } from '../../store/view'
 import { useTheoryStore } from '../../store/theory'
 import { useFretboardStore } from '../../store/fretboard'
+import { supportsVoicings } from '../../theory/chordVoicings'
 import { useProgressionStore } from '../../store/progression'
 import { ALL_INTERVALS } from '../../theory/intervals'
 import { SEMITONE_TO_INTERVAL } from '../../theory/constants'
@@ -75,12 +76,12 @@ export function FretboardToolbar({ onHearScale }: Props) {
   const root             = useTheoryStore(s => s.root)
   const hasScale         = useTheoryStore(s => s.scale !== null)
   const fretCount        = useFretboardStore(s => s.fretCount)
-  const tuningId         = useFretboardStore(s => s.tuning.id)
+  const tuning           = useFretboardStore(s => s.tuning)
 
-  // The chord database stores standard-tuning fingerings, so getChordVoicings
-  // returns nothing for any other tuning. That branch was unreachable until the
-  // tuning menu shipped; without this the mode just looks broken.
-  const voicingsUnavailable = mode === 'chords' && tuningId !== 'standard'
+  // Ask the domain rather than re-deriving which tunings have shapes; the two
+  // copies of this rule are exactly how the toolbar came to promise voicings
+  // the database could never supply.
+  const voicingsUnavailable = mode === 'chords' && !supportsVoicings(tuning)
 
   // With no chord picked, Chords mode falls back to the root major triad
   // (useFretboardAnnotations) and draws shapes for it. Nothing in the chrome

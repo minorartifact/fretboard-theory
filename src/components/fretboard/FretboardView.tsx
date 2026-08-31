@@ -2,7 +2,7 @@ import { useState, useRef, useEffect, useMemo, useCallback } from 'react'
 import { useFretboardAnnotations } from '../../hooks/useFretboardAnnotations'
 import { useFretboardStore } from '../../store/fretboard'
 import { useTheoryStore } from '../../store/theory'
-import { useProgressionStore } from '../../store/progression'
+import { useProgressionStore, useDisplayedStep } from '../../store/progression'
 import { useInteractiveStore, POSITIONS } from '../../store/interactive'
 import { FretboardCell } from './FretboardCell'
 import { FretboardInlays } from './FretboardInlays'
@@ -24,8 +24,7 @@ export function FretboardView() {
   const chordQualityId = useTheoryStore(s => s.chordQualityId)
   const root           = useTheoryStore(s => s.root)
   const scale          = useTheoryStore(s => s.scale)
-  const hoveredStep    = useProgressionStore(s => s.hoveredStep)
-  const activeStep     = useProgressionStore(s => s.activeStep)
+  const progStep       = useDisplayedStep()
   const progSteps      = useProgressionStore(s => s.steps)
 
   const hoverPc     = useInteractiveStore(s => s.hoverPc)
@@ -42,7 +41,6 @@ export function FretboardView() {
   const anchor            = useInteractiveStore(s => s.anchor)
   const setAnchor         = useInteractiveStore(s => s.setAnchor)
 
-  const progStep    = hoveredStep ?? activeStep
   const chordActive = voicingMode || chordQualityId !== null || (progStep !== null && progSteps.length > 0)
   const setHoverPc = useInteractiveStore(s => s.setHoverPc)
   const togglePin  = useInteractiveStore(s => s.togglePin)

@@ -71,13 +71,28 @@ function positionToCells(pos: Position): Set<string> {
 }
 
 /**
- * Return DB-sourced guitar voicings for `chord` in standard tuning.
- * Returns an empty array for non-standard tunings, unmapped chord qualities, or
- * while the database is still loading — call `loadChordDb()` first.
+ * Whether the database has shapes for this tuning at all.
+ *
+ * It stores *fingerings*, not intervals, so its positions cannot be transposed
+ * to another tuning. Exported because the UI has to explain an empty Chords
+ * mode, and re-deriving the rule there let the two drift: the tuning menu made
+ * this branch reachable and the toolbar went on promising voicings.
+ */
+export function supportsVoicings(tuning: Tuning): boolean {
+  return tuning.id === 'standard'
+}
+
+/**
+ * Return DB-sourced guitar voicings for `chord`.
+ *
+ * Returns an empty array for four different reasons — unsupported tuning,
+ * unmapped chord quality, unknown chord, or a database still loading. Callers
+ * that need to tell a user *why* must ask `supportsVoicings` / `isChordDbLoaded`
+ * rather than reading anything into the empty array.
  */
 export function getChordVoicings(chord: Chord, tuning: Tuning): ChordVoicing[] {
   if (!db) return []
-  if (tuning.id !== 'standard') return []
+  if (!supportsVoicings(tuning)) return []
 
   const suffix = QUALITY_TO_SUFFIX[chord.quality.id]
   if (!suffix) return []

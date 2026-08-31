@@ -51,11 +51,6 @@ export function neckBottom(): number {
   return stringY(0) + L.neckPad
 }
 
-/** Y centre of the neck (for on-neck inlay dots). */
-export function neckMidY(): number {
-  return (neckTop() + neckBottom()) / 2
-}
-
 /** Y coordinate of fret number labels (below the neck). */
 export function fretNumY(): number {
   return neckBottom() + 24
