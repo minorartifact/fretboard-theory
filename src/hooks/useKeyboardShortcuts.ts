@@ -50,7 +50,7 @@ export function useKeyboardShortcuts() {
         return
       }
 
-      // 1-9 toggle the highlight for the nth note of the current scale,
+      // 2-9 toggle the highlight for the nth note of the current scale,
       // matching the chips above the neck. 0 clears the selection.
       if (e.code === 'Digit0') {
         e.preventDefault()
@@ -64,6 +64,8 @@ export function useKeyboardShortcuts() {
         if (!scale) return
         const semitones = scale.pattern[Number(digit[1]) - 1]
         if (semitones === undefined) return
+        // The tonic is always shown on the neck, so `1` is not a toggle.
+        if (semitones === 0) return
         e.preventDefault()
         toggleInterval(semitones)
       }

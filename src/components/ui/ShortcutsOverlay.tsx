@@ -8,7 +8,7 @@ const GROUPS: { title: string; rows: [string, string][] }[] = [
   {
     title: 'Fretboard',
     rows: [
-      ['1 – 9', 'Spotlight the nth note of the scale'],
+      ['2 – 9', 'Spotlight the nth note of the scale'],
       ['0',     'Clear the spotlight'],
     ],
   },

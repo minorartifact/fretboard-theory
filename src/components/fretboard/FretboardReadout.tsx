@@ -119,7 +119,7 @@ export function FretboardReadout() {
       return row(<>
         <span style={SECTION_LABEL}>Tip</span>
         <span style={{ fontSize: '14px', color: '#9a8f82' }}>
-          Tap any fret to hear its true pitch · hover a note to light up its octaves · press 1-9 to spotlight a scale degree.
+          Tap any fret to hear its true pitch · hover a note to light up its octaves · press 2-9 to spotlight a scale degree.
         </span>
       </>)
     }

@@ -62,31 +62,51 @@ export function NoteChips() {
           }
         }
 
-        const selected = selectedIntervals.includes(semitones)
+        // The tonic is never dimmed by a selection — it is the reference the other
+        // degrees are read against. Rendering it as a toggle made it a control that
+        // did nothing, so it is a static chip instead.
+        const isTonic  = semitones === 0
+        const selected = !isTonic && selectedIntervals.includes(semitones)
         const shortcut = i < 9 ? String(i + 1) : null
 
-        return (
+        const chipStyle = {
+          display: 'inline-flex', alignItems: 'center', gap: '6px',
+          padding: '5px 12px', borderRadius: '999px',
+          background: chipColor,
+          color: chordActive ? '#fff' : degreeTextColor(degLabel),
+          fontFamily: "'JetBrains Mono', monospace",
+          fontWeight: 700, fontSize: '14px',
+          opacity, cursor: isTonic ? 'default' : 'pointer',
+          outline: selected ? '2px solid #f1ebe2' : '2px solid transparent',
+          outlineOffset: '2px',
+          transition: 'opacity .15s, outline-color .12s',
+        } as const
+
+        const face = (
+          <>
+            <span>{noteName}</span>
+            <span style={{ fontSize: '10px', opacity: 0.72, fontWeight: 600 }}>{degLabel}</span>
+          </>
+        )
+
+        return isTonic ? (
+          <span
+            key={i}
+            title={`${noteName} · degree ${degLabel} — the root, always shown on the neck`}
+            style={chipStyle}
+          >
+            {face}
+          </span>
+        ) : (
           <button
             key={i}
             onClick={() => toggleInterval(semitones)}
             title={shortcut
               ? `${noteName} · degree ${degLabel} — click or press ${shortcut} to highlight`
               : `${noteName} · degree ${degLabel} — click to highlight`}
-            style={{
-              display: 'inline-flex', alignItems: 'center', gap: '6px',
-              padding: '5px 12px', borderRadius: '999px',
-              background: chipColor,
-              color: chordActive ? '#fff' : degreeTextColor(degLabel),
-              fontFamily: "'JetBrains Mono', monospace",
-              fontWeight: 700, fontSize: '14px',
-              opacity, cursor: 'pointer',
-              outline: selected ? '2px solid #f1ebe2' : '2px solid transparent',
-              outlineOffset: '2px',
-              transition: 'opacity .15s, outline-color .12s',
-            }}
+            style={chipStyle}
           >
-            <span>{noteName}</span>
-            <span style={{ fontSize: '10px', opacity: 0.72, fontWeight: 600 }}>{degLabel}</span>
+            {face}
           </button>
         )
       })}
