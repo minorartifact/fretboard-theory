@@ -215,7 +215,13 @@ export const useProgressionStore = create<ProgressionState & ProgressionActions>
           return { steps, activeStep, hoveredStep }
         }),
 
-      focusStep: index => set({ activeStep: index }),
+      // Focusing a step hands the neck to the progression. A chord quality
+      // would otherwise sit in the store unused and invisible — and reappear
+      // the moment the playhead released.
+      focusStep: index => {
+        if (index !== null) useTheoryStore.getState().setChordQualityId(null)
+        set({ activeStep: index })
+      },
       hoverStep: index => set({ hoveredStep: index }),
 
       stepBy: dir =>

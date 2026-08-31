@@ -1,4 +1,5 @@
 import { useTheoryStore } from '../../store/theory'
+import { chooseChordQuality } from '../../store/selection'
 import { CHORD_QUALITIES_BY_ID } from '../../theory/chords'
 import type { ChordQuality } from '../../theory/types'
 
@@ -16,7 +17,7 @@ function buttonLabel(q: ChordQuality): string {
 
 export function ChordQualitySelector() {
   const chordQualityId    = useTheoryStore(s => s.chordQualityId)
-  const setChordQualityId = useTheoryStore(s => s.setChordQualityId)
+  const setChordQualityId = chooseChordQuality
 
   function toggle(id: string) {
     setChordQualityId(chordQualityId === id ? null : id)

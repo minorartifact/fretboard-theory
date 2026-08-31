@@ -4,6 +4,7 @@ import { useFretboardStore } from '../fretboard'
 import { useInteractiveStore, POSITIONS } from '../interactive'
 import { useProgressionStore } from '../progression'
 import { useSongsStore, type SavedSong } from '../songs'
+import { chooseChordQuality } from '../selection'
 import { SCALES_BY_ID } from '../../theory/scales'
 import { TUNINGS_BY_ID } from '../../theory/fretboard'
 
@@ -66,6 +67,34 @@ describe('store invariants', () => {
     expect(after.pinned).toEqual([])
     expect(after.selectedIntervals).toEqual([])
     expect(after.anchor).toBeNull()
+  })
+
+  it('focusing a step drops a chord quality it would silently override', () => {
+    useProgressionStore.setState({ steps: [{ degree: 1 }, { degree: 4 }] })
+    useTheoryStore.getState().setChordQualityId('maj')
+
+    useProgressionStore.getState().focusStep(0)
+    expect(useTheoryStore.getState().chordQualityId).toBeNull()
+  })
+
+  it('choosing a chord quality releases the playhead so the choice is visible', () => {
+    useProgressionStore.setState({ steps: [{ degree: 1 }, { degree: 4 }], activeStep: 1 })
+
+    chooseChordQuality('dim')
+    expect(useProgressionStore.getState().activeStep).toBeNull()
+    expect(useTheoryStore.getState().chordQualityId).toBe('dim')
+  })
+
+  it('clearing the quality leaves the playhead alone — that is not taking over', () => {
+    useProgressionStore.setState({ steps: [{ degree: 1 }], activeStep: 0 })
+
+    chooseChordQuality(null)
+    expect(useProgressionStore.getState().activeStep).toBe(0)
+  })
+
+  it('releasing the playhead does not clear the quality that released it', () => {
+    chooseChordQuality('min')
+    expect(useTheoryStore.getState().chordQualityId).toBe('min')
   })
 
   it('loading a song does not leave an undo pointing at the replaced progression', () => {

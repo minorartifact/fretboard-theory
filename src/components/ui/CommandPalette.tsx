@@ -1,6 +1,7 @@
 import { useCallback, useMemo, useState } from 'react'
 import { useViewStore, type PaletteKind } from '../../store/view'
 import { useTheoryStore } from '../../store/theory'
+import { chooseChordQuality } from '../../store/selection'
 import { SCALES } from '../../theory/scales'
 import { CHORD_QUALITIES, getChordNotes } from '../../theory/chords'
 import { SHARP_NAMES } from '../../theory/constants'
@@ -40,7 +41,7 @@ export function CommandPalette() {
   const chordQualityId = useTheoryStore(s => s.chordQualityId)
   const setRoot        = useTheoryStore(s => s.setRoot)
   const setScale       = useTheoryStore(s => s.setScale)
-  const setQuality     = useTheoryStore(s => s.setChordQualityId)
+  const setQuality     = chooseChordQuality
 
   const [query, setQuery]       = useState('')
   const [selected, setSelected] = useState(0)
