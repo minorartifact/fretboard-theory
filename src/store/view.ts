@@ -1,6 +1,9 @@
 import { create } from 'zustand'
 import type { LabelMode } from '../theory/types'
 
+/** What a quick-pick is choosing. Each has its own shortcut key. */
+export type PaletteKind = 'tonic' | 'scale' | 'quality'
+
 /**
  * `fullscreen` strips the app chrome down to the fretboard and the progression
  * cards — the play-along view. `showProgression` hides the progression panel in
@@ -15,6 +18,8 @@ interface ViewState {
   shortcutsOpen:   boolean
   /** Guided tour overlay. Transient: not persisted, not in the share URL. */
   tourOpen:        boolean
+  /** Quick-pick overlay, or null when closed. Also transient. */
+  palette:         PaletteKind | null
 }
 
 interface ViewActions {
@@ -28,6 +33,8 @@ interface ViewActions {
   closeShortcuts:    ()               => void
   openTour:          ()               => void
   closeTour:         ()               => void
+  openPalette:       (kind: PaletteKind) => void
+  closePalette:      ()               => void
 }
 
 export const useViewStore = create<ViewState & ViewActions>(set => ({
@@ -37,6 +44,7 @@ export const useViewStore = create<ViewState & ViewActions>(set => ({
   sidebarOpen:     false,
   shortcutsOpen:   false,
   tourOpen:        false,
+  palette:         null,
 
   setLabelMode:      labelMode => set({ labelMode }),
   setFullscreen:     fullscreen => set({ fullscreen }),
@@ -50,4 +58,7 @@ export const useViewStore = create<ViewState & ViewActions>(set => ({
   // hidden most of what it points at.
   openTour:          () => set({ tourOpen: true, shortcutsOpen: false, fullscreen: false }),
   closeTour:         () => set({ tourOpen: false }),
+  // The quick-pick and the tour both own the keyboard, so they cannot overlap.
+  openPalette:       kind => set({ palette: kind, tourOpen: false }),
+  closePalette:      () => set({ palette: null }),
 }))

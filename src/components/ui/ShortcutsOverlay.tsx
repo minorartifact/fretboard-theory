@@ -6,6 +6,14 @@ const GROUPS: { title: string; rows: [string, string][] }[] = [
     rows: [['Space', 'Play / pause the progression']],
   },
   {
+    title: 'Quick picks',
+    rows: [
+      ['T', 'Change key'],
+      ['S', 'Find a scale or mode'],
+      ['Q', 'Pick a chord quality'],
+    ],
+  },
+  {
     title: 'Fretboard',
     rows: [
       ['2 – 9', 'Spotlight the nth note of the scale'],

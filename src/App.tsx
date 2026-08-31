@@ -13,6 +13,7 @@ import { NeckMenus } from './components/ui/NeckMenus'
 import { KeyStrip } from './components/theory/KeyStrip'
 import { ShortcutsOverlay } from './components/ui/ShortcutsOverlay'
 import { GuidedTour, GuidedTourButton } from './components/ui/GuidedTour'
+import { CommandPalette } from './components/ui/CommandPalette'
 import { useTheoryStore } from './store/theory'
 import { useProgressionStore, useDisplayedStep } from './store/progression'
 import { useViewStore } from './store/view'
@@ -200,6 +201,7 @@ function App() {
 
       <ShortcutsOverlay />
       {tourOpen && <GuidedTour />}
+      <CommandPalette />
     </div>
   )
 }
