@@ -25,7 +25,7 @@ export function ScaleSelector() {
   }, [query])
 
   return (
-    <section style={{ flex: 1, minHeight: 0, overflowY: 'auto' }}>
+    <section data-tour="scales" style={{ flex: 1, minHeight: 0, overflowY: 'auto' }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: '8px', position: 'sticky', top: 0, background: 'var(--bg-panel)', paddingBottom: '6px', marginBottom: '6px', zIndex: 1 }}>
         <div style={{ position: 'relative', flex: 1, minWidth: 0 }}>
           <span style={{ position: 'absolute', left: '9px', top: '50%', transform: 'translateY(-50%)', fontSize: '11px', color: '#6b6258', pointerEvents: 'none' }}>

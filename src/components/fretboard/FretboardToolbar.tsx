@@ -102,7 +102,7 @@ export function FretboardToolbar({ onHearScale }: Props) {
   const modeLabel  = activeMode?.label ?? ''
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+    <div data-tour="modes" style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
         <span style={GROUP_LABEL}>Mode</span>
         <div style={SEGMENTED}>

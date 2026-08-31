@@ -197,6 +197,7 @@ export function FretboardView() {
 
       <div style={{ flex: 1, minHeight: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', overflowX: 'auto', overflowY: 'hidden', paddingBottom: '8px' }}>
         <svg
+          data-tour="board"
           viewBox={`0 0 ${W} ${H}`}
           width="100%"
           height="100%"

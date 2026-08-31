@@ -23,6 +23,11 @@ export function useKeyboardShortcuts() {
       const onFretboard = (e.target as Element | null)?.closest?.('[data-fretcell]') != null
       if (onFretboard && (e.code === 'Space' || e.key.startsWith('Arrow') || e.key === 'Enter')) return
 
+      // The tour owns the keyboard while it runs — it has its own Esc, arrows
+      // and Enter, and Space toggling playback underneath it would be a
+      // surprise.
+      if (useViewStore.getState().tourOpen) return
+
       // Esc unwinds one layer at a time, innermost first.
       if (e.code === 'Escape') {
         const v = useViewStore.getState()

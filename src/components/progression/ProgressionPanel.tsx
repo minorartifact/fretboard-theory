@@ -143,7 +143,7 @@ export function ProgressionPanel() {
       ) : (
       <>
       {/* ── Left: diatonic chord palette ─────────────────────────────── */}
-      <div style={{ flex: '1 1 430px', minWidth: 0 }}>
+      <div data-tour="chords" style={{ flex: '1 1 430px', minWidth: 0 }}>
         <div style={{ fontSize: '11px', fontWeight: 700, letterSpacing: '.16em', textTransform: 'uppercase', color: '#6b6258', marginBottom: '12px' }}>
           Diatonic chords
           {ec !== 'new' ? (
@@ -245,7 +245,7 @@ export function ProgressionPanel() {
       </div>
 
       {/* ── Right: progression track + transport ─────────────────────── */}
-      <div style={{ flex: '1 1 360px', minWidth: 0 }}>
+      <div data-tour="prog" style={{ flex: '1 1 360px', minWidth: 0 }}>
 
         {/* Header row */}
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px', gap: '10px', flexWrap: 'wrap' }}>

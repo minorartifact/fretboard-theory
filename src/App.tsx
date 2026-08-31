@@ -12,6 +12,7 @@ import { LabelModeToggle } from './components/ui/LabelModeToggle'
 import { NeckMenus } from './components/ui/NeckMenus'
 import { KeyStrip } from './components/theory/KeyStrip'
 import { ShortcutsOverlay } from './components/ui/ShortcutsOverlay'
+import { GuidedTour, GuidedTourButton } from './components/ui/GuidedTour'
 import { useTheoryStore } from './store/theory'
 import { useProgressionStore, useDisplayedStep } from './store/progression'
 import { useViewStore } from './store/view'
@@ -56,6 +57,7 @@ function MainHeader({ narrow }: { narrow: boolean }) {
   return (
     <header style={{ padding: '28px 40px 0', display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '24px', flexShrink: 0 }}>
       <div>
+        <div data-tour="key">
         {narrow && (
           <button
             onClick={openSidebar}
@@ -85,9 +87,13 @@ function MainHeader({ narrow }: { narrow: boolean }) {
           </div>
         )}
         <KeyStrip />
+        </div>
       </div>
       <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '11px', flexShrink: 0 }}>
-        <LabelModeToggle />
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+          <GuidedTourButton />
+          <LabelModeToggle />
+        </div>
         <NeckMenus />
       </div>
     </header>
@@ -131,6 +137,7 @@ function App() {
   const fullscreen      = useViewStore(s => s.fullscreen)
   const showProgression = useViewStore(s => s.showProgression)
   const sidebarOpen     = useViewStore(s => s.sidebarOpen)
+  const tourOpen        = useViewStore(s => s.tourOpen)
   const closeSidebar    = useViewStore(s => s.closeSidebar)
   const narrow          = useMediaQuery(NARROW)
   const clearFretboardSelection = useInteractiveStore(s => s.clearSelection)
@@ -176,7 +183,7 @@ function App() {
           <>
             <MainHeader narrow={narrow} />
 
-            <div style={{ padding: '22px 40px 16px', flexShrink: 0 }}>
+            <div data-tour="chips" style={{ padding: '22px 40px 16px', flexShrink: 0 }}>
               <NoteChips />
             </div>
           </>
@@ -192,6 +199,7 @@ function App() {
       </main>
 
       <ShortcutsOverlay />
+      {tourOpen && <GuidedTour />}
     </div>
   )
 }

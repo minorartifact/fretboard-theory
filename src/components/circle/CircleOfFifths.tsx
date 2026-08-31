@@ -122,6 +122,7 @@ export function CircleOfFifths() {
       </div>
 
       <svg
+        data-tour="circle"
         viewBox={`0 0 ${SIZE} ${SIZE}`}
         width={SIZE}
         height={SIZE}
