@@ -58,14 +58,13 @@ export function deserializeSteps(raw: unknown): ProgressionStep[] {
 
 const STORAGE_KEY = 'ftp.v1'
 
-function load(): Partial<{ steps: ProgressionStep[]; activeStep: number | null; bpm: number; loop: boolean; metronome: boolean }> {
+function load(): Partial<{ steps: ProgressionStep[]; bpm: number; loop: boolean; metronome: boolean }> {
   try {
     const raw = localStorage.getItem(STORAGE_KEY)
     if (!raw) return {}
     const d = JSON.parse(raw)
     return {
       steps:      deserializeSteps(d.steps),
-      activeStep: typeof d.activeStep === 'number' ? d.activeStep : null,
       bpm:        typeof d.bpm  === 'number'  ? Math.max(40, Math.min(220, d.bpm)) : 100,
       loop:       typeof d.loop === 'boolean' ? d.loop : true,
       metronome:  typeof d.metronome === 'boolean' ? d.metronome : false,
@@ -73,11 +72,15 @@ function load(): Partial<{ steps: ProgressionStep[]; activeStep: number | null; 
   } catch { return {} }
 }
 
-function save(s: { steps: ProgressionStep[]; activeStep: number | null; bpm: number; loop: boolean; metronome: boolean }) {
+/**
+ * activeStep is deliberately NOT persisted. Restoring it put returning visitors
+ * straight into a chord-dimmed fretboard, which reads as the scale selector
+ * being broken. The progression comes back; the playhead starts released.
+ */
+function save(s: { steps: ProgressionStep[]; bpm: number; loop: boolean; metronome: boolean }) {
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify({
       steps:      serializeSteps(s.steps),
-      activeStep: s.activeStep,
       bpm:        s.bpm,
       loop:       s.loop,
       metronome:  s.metronome,
@@ -160,7 +163,7 @@ export const useProgressionStore = create<ProgressionState & ProgressionActions>
 
     return {
       steps:       persisted.steps      ?? [],
-      activeStep:  persisted.activeStep ?? null,
+      activeStep:  null,
       hoveredStep: null,
       beatIndex:   0,
       playing:     false,
@@ -285,7 +288,6 @@ export const useProgressionStore = create<ProgressionState & ProgressionActions>
 useProgressionStore.subscribe(state => {
   save({
     steps: state.steps,
-    activeStep: state.activeStep,
     bpm: state.bpm,
     loop: state.loop,
     metronome: state.metronome,

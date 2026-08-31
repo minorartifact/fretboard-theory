@@ -23,9 +23,12 @@ export function useShareUrl() {
     if (parsed.scaleId        != null) setScale(SCALES_BY_ID[parsed.scaleId] ?? null)
     if (parsed.chordQualityId !== undefined) setChordQualityId(parsed.chordQualityId)
     if (parsed.labelMode      !== undefined) setLabelMode(parsed.labelMode)
-    // A shared link wins over whatever this browser had saved locally.
+    // A shared link wins over whatever this browser had saved locally. The
+    // playhead stays released: the effect below writes steps back into the URL,
+    // so focusing step 0 here would re-dim the neck on every reload, not just
+    // on a genuinely shared link.
     if (parsed.steps?.length) {
-      useProgressionStore.setState({ steps: parsed.steps, activeStep: 0, hoveredStep: null })
+      useProgressionStore.setState({ steps: parsed.steps, activeStep: null, hoveredStep: null })
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])

@@ -113,12 +113,19 @@ export function ProgressionPanel() {
 
   const handleStepClick = useCallback((idx: number) => {
     const alreadySelected = ec === idx && activeStep === idx
-    setEditCursor(idx)
-    focusStep(idx)
     if (alreadySelected) {
+      // Clicking the active card previews it and then releases the playhead.
+      // Without a way to deselect, an active step held the fretboard in
+      // chord-dimmed mode and only Clear — which discards the progression —
+      // could get back to the plain scale view.
       const chord = useProgressionStore.getState().activeChord()
       if (chord) playChord(chord.root, chord.quality.pattern)
+      focusStep(null)
+      setEditCursor('new')
+      return
     }
+    setEditCursor(idx)
+    focusStep(idx)
   }, [ec, activeStep, focusStep])
 
   return (

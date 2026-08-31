@@ -174,3 +174,43 @@ describe('progression persistence round-trips', () => {
     expect(deserializeSteps([{ degree: 0 }, { degree: 3 }])).toEqual([{ degree: 3 }])
   })
 })
+
+describe('progression store — persistence', () => {
+  // jsdom here has no localStorage, and the store swallows the failure by
+  // design, so stub a real one or these assertions test nothing.
+  let mem: Record<string, string>
+
+  beforeEach(() => {
+    mem = {}
+    vi.stubGlobal('localStorage', {
+      getItem:    (k: string) => (k in mem ? mem[k] : null),
+      setItem:    (k: string, v: string) => { mem[k] = String(v) },
+      removeItem: (k: string) => { delete mem[k] },
+    })
+    reset()
+  })
+
+  afterEach(() => vi.unstubAllGlobals())
+
+  const stored = () => JSON.parse(mem['ftp.v1'] ?? '{}')
+
+  it('persists the steps so a progression survives a reload', () => {
+    s().append(4)
+    expect(stored().steps).toEqual([{ degree: 4 }])
+  })
+
+  it('never writes activeStep — a restored playhead would dim the neck on load', () => {
+    s().append(4)
+    s().append(5)
+    s().focusStep(1)
+    expect(s().activeStep).toBe(1)
+    expect(stored()).not.toHaveProperty('activeStep')
+  })
+
+  it('still persists transport settings', () => {
+    s().setBpm(140)
+    s().toggleMetronome()
+    expect(stored().bpm).toBe(140)
+    expect(stored().metronome).toBe(true)
+  })
+})
