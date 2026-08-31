@@ -2,6 +2,7 @@ import { useInteractiveStore, POSITIONS, type FretboardMode } from '../../store/
 import { useViewStore } from '../../store/view'
 import { useTheoryStore } from '../../store/theory'
 import { useFretboardStore } from '../../store/fretboard'
+import { useProgressionStore } from '../../store/progression'
 import { ALL_INTERVALS } from '../../theory/intervals'
 import { SEMITONE_TO_INTERVAL } from '../../theory/constants'
 import { getPitchName } from '../../theory/pitch'
@@ -80,6 +81,18 @@ export function FretboardToolbar({ onHearScale }: Props) {
   // returns nothing for any other tuning. That branch was unreachable until the
   // tuning menu shipped; without this the mode just looks broken.
   const voicingsUnavailable = mode === 'chords' && tuningId !== 'standard'
+
+  // With no chord picked, Chords mode falls back to the root major triad
+  // (useFretboardAnnotations) and draws shapes for it. Nothing in the chrome
+  // named that chord, so the neck showed voicings for a subject the UI never
+  // mentioned — and hid the scale to do it.
+  const chordQualityId = useTheoryStore(s => s.chordQualityId)
+  const progSteps      = useProgressionStore(s => s.steps.length)
+  const progStep       = useProgressionStore(s => s.hoveredStep ?? s.activeStep)
+  const usingDefaultChord =
+    mode === 'chords' &&
+    chordQualityId === null &&
+    !(progStep !== null && progSteps > 0)
 
   const anchorPc   = anchor?.pc ?? root
   const anchorName = getPitchName(anchorPc, 'auto', root)
@@ -161,11 +174,18 @@ export function FretboardToolbar({ onHearScale }: Props) {
         fontSize: '12px', lineHeight: 1.5, color: '#8a7f72',
       }}>
         <span style={{ fontWeight: 700, color: MODE_ACCENT[mode].fg }}>{modeLabel}</span>
-        {voicingsUnavailable
-          ? <span style={{ color: '#f0cf95' }}>
-              — voicing shapes are standard-tuning fingerings, so there are none to show in this tuning. Switch back to Standard (EADGBe) to see them.
-            </span>
-          : <span>— {hint}</span>}
+        {voicingsUnavailable ? (
+          <span style={{ color: '#f0cf95' }}>
+            — voicing shapes are standard-tuning fingerings, so there are none to show in this tuning. Switch back to Standard (EADGBe) to see them.
+          </span>
+        ) : usingDefaultChord ? (
+          <span>
+            — showing <strong style={{ color: '#6cd8e8', fontWeight: 700 }}>{getPitchName(root, 'auto', root)} major</strong>, the default.
+            Pick a chord quality in the sidebar, or a step in your progression, to see another. Notes outside the chord are dimmed.
+          </span>
+        ) : (
+          <span>— {hint}</span>
+        )}
       </div>
 
       {mode === 'intervals' && (

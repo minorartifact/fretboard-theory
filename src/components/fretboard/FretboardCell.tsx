@@ -25,6 +25,7 @@ interface Props {
   chordActive:   boolean
   hoverPc:       PitchClass | null
   inWindow:      boolean
+  identify:      boolean          // every note is a target in identify mode
   isPinned:      boolean
   isFlash:       boolean
   voicingColor:  string | null
@@ -45,7 +46,7 @@ interface Props {
 
 export function FretboardCell({
   annotation, x, y, chordActive,
-  hoverPc, inWindow, isPinned, isFlash, voicingColor, voicingMode,
+  hoverPc, inWindow, identify, isPinned, isFlash, voicingColor, voicingMode,
   intervalsLive, intervalLit, intervalLabel, isTonic, isAnchor,
   cellId, ariaLabel, isFocused, showFocusRing,
   onPointerDown, onMouseEnter, onMouseLeave,
@@ -110,7 +111,9 @@ export function FretboardCell({
           <g opacity={dotOpacity}>
             <circle
               cx={x} cy={y}
-              r={isPinned ? L.dotRadius : 6}
+              /* Identify is the one mode where an out-of-scale note is just as
+                 tappable as a scale tone, and nothing else on the neck says so. */
+              r={isPinned ? L.dotRadius : (identify ? 9 : 6)}
               fill={isPinned ? '#5a5168' : '#c7bcae'}
               stroke={isPinned ? 'rgba(255,255,255,.5)' : 'none'}
               strokeWidth={1}

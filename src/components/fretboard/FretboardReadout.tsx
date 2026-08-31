@@ -175,15 +175,22 @@ export function FretboardReadout() {
   let result: React.ReactNode
 
   if (pinned.length === 0) {
+    // Nothing on the neck changes when you enter this mode, so if the readout
+    // stays a caption too, the mode switch looks like it did nothing at all.
     result = (
-      <span style={{ fontSize: '14px', color: '#9a8f82' }}>
-        Tap notes anywhere on the neck — two notes name the interval, three or more name the chord.
-      </span>
+      <div style={{ display: 'flex', alignItems: 'baseline', gap: '12px', flexWrap: 'wrap' }}>
+        <span style={{ fontSize: '20px', fontWeight: 800, color: '#f0cf95' }}>
+          Tap any note to start
+        </span>
+        <span style={{ fontSize: '13px', color: '#8a7f72' }}>
+          two notes name the interval between them · three or more name the chord
+        </span>
+      </div>
     )
   } else if (pinned.length === 1) {
     result = (
-      <span style={{ fontSize: '14px', color: '#8a7f72' }}>
-        Add another note to measure an interval.
+      <span style={{ fontSize: '15px', color: '#cdbfaf' }}>
+        Add another note to measure the interval.
       </span>
     )
   } else if (pinned.length === 2) {
