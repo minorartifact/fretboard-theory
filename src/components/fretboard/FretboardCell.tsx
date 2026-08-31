@@ -9,9 +9,13 @@ const ANCHOR_STROKE = '#a98ae0'
 /** Dimming levels. Nothing below HIT_FLOOR accepts pointer events. */
 const DIM_FLOOR     = 0.3    // out-of-scale notes, always legible
 const HIT_FLOOR     = 0.2    // below this a dot is decoration, not a target
+                             // NB: chord dimming sits exactly at the floor —
+                             // dropping it lower makes every scale tone that
+                             // is not in the active chord untappable, while
+                             // out-of-scale notes at DIM_FLOOR stay tappable.
 const OUT_OF_WINDOW = 0.14
 const UNLIT         = 0.1
-const CHORD_DIM     = 0.16
+const CHORD_DIM     = 0.2    // at the floor on purpose: still a target
 const VOICING_DIM   = 0.07
 
 interface Props {

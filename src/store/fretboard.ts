@@ -1,5 +1,6 @@
 import { create } from 'zustand'
 import { TUNINGS_BY_ID } from '../theory/fretboard'
+import { useInteractiveStore, POSITIONS } from './interactive'
 import type { Tuning } from '../theory/types'
 
 interface FretboardState {
@@ -19,6 +20,13 @@ export const useFretboardStore = create<FretboardState & FretboardActions>(set =
   fretCount: 15,
   startFret: 0,
   setTuning:    tuning    => set({ tuning }),
-  setFretCount: fretCount => set({ fretCount }),
+  // A position window that runs past the end of the neck leaves nearly every
+  // dot out-of-window, and out-of-window dots are not pointer targets — so a
+  // shorter neck could render the fretboard inert. Drop the window instead.
+  setFretCount: fretCount => {
+    const { posIdx, setPosIdx } = useInteractiveStore.getState()
+    if (posIdx !== null && (POSITIONS[posIdx]?.hi ?? 0) > fretCount) setPosIdx(null)
+    set({ fretCount })
+  },
   setStartFret: startFret => set({ startFret }),
 }))

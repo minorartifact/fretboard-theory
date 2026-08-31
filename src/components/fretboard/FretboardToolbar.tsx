@@ -1,6 +1,7 @@
 import { useInteractiveStore, POSITIONS, type FretboardMode } from '../../store/interactive'
 import { useViewStore } from '../../store/view'
 import { useTheoryStore } from '../../store/theory'
+import { useFretboardStore } from '../../store/fretboard'
 import { ALL_INTERVALS } from '../../theory/intervals'
 import { SEMITONE_TO_INTERVAL } from '../../theory/constants'
 import { getPitchName } from '../../theory/pitch'
@@ -72,6 +73,7 @@ export function FretboardToolbar({ onHearScale }: Props) {
   const toggleFullscreen = useViewStore(s => s.toggleFullscreen)
   const root             = useTheoryStore(s => s.root)
   const hasScale         = useTheoryStore(s => s.scale !== null)
+  const fretCount        = useFretboardStore(s => s.fretCount)
 
   const anchorPc   = anchor?.pc ?? root
   const anchorName = getPitchName(anchorPc, 'auto', root)
@@ -104,7 +106,7 @@ export function FretboardToolbar({ onHearScale }: Props) {
           <button onClick={() => setPosIdx(null)} style={posIdx === null ? { ...SEG_BTN, background: '#2c241c', color: '#f1ebe2' } : SEG_BTN}>
             All
           </button>
-          {POSITIONS.map((pos, i) => (
+          {POSITIONS.map((pos, i) => ({ pos, i })).filter(({ pos }) => pos.hi <= fretCount).map(({ pos, i }) => (
             <button
               key={i}
               onClick={() => setPosIdx(posIdx === i ? null : i)}

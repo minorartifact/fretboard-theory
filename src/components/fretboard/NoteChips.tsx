@@ -82,9 +82,10 @@ export function NoteChips() {
           transition: 'opacity .15s, outline-color .12s',
         } as const
 
-        // F3: nothing marked these as pressable, and the 2-9 mapping they mirror
-        // was only mentioned in the tip line under the neck. The keycap puts the
-        // shortcut on the control itself; the tonic reads as locked instead.
+        // F3: nothing marked these as pressable. The chip's position in the row
+        // is its 2-9 shortcut, and the tooltip spells that out — a separate
+        // keycap just repeated the degree number on unaltered scales. The tonic
+        // reads as locked rather than pretending to be a toggle.
         const face = (
           <>
             <span>{noteName}</span>
@@ -96,16 +97,7 @@ export function NoteChips() {
               }}>
                 TONIC
               </span>
-            ) : shortcut && (
-              <span style={{
-                display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-                minWidth: '15px', height: '15px', borderRadius: '4px',
-                background: 'rgba(0,0,0,.28)', color: 'inherit',
-                fontSize: '11px', fontWeight: 700, opacity: 0.85, marginLeft: '1px',
-              }}>
-                {shortcut}
-              </span>
-            )}
+            ) : null}
           </>
         )
 
