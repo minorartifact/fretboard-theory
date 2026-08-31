@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useEffect, useRef } from 'react'
 import { useTheoryStore } from '../store/theory'
 import { useViewStore } from '../store/view'
 import { useProgressionStore } from '../store/progression'
@@ -16,9 +16,16 @@ export function useShareUrl() {
   const setLabelMode      = useViewStore(s => s.setLabelMode)
   const steps             = useProgressionStore(s => s.steps)
 
+  // The sync effect below runs on the same commit as this one, with the values
+  // from the first render, so it writes the *defaults* back to the URL before
+  // hydration lands. Under StrictMode this effect then runs a second time and
+  // would re-read that clobbered URL, discarding the link's root and scale.
+  // Capture the address bar as it was on arrival instead.
+  const initialSearch = useRef(window.location.search)
+
   // Hydrate stores from URL on first mount
   useEffect(() => {
-    const parsed = decodeUrlState(window.location.search)
+    const parsed = decodeUrlState(initialSearch.current)
     if (parsed.root           !== undefined) setRoot(parsed.root)
     if (parsed.scaleId        != null) setScale(SCALES_BY_ID[parsed.scaleId] ?? null)
     if (parsed.chordQualityId !== undefined) setChordQualityId(parsed.chordQualityId)

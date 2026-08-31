@@ -74,6 +74,12 @@ export function FretboardToolbar({ onHearScale }: Props) {
   const root             = useTheoryStore(s => s.root)
   const hasScale         = useTheoryStore(s => s.scale !== null)
   const fretCount        = useFretboardStore(s => s.fretCount)
+  const tuningId         = useFretboardStore(s => s.tuning.id)
+
+  // The chord database stores standard-tuning fingerings, so getChordVoicings
+  // returns nothing for any other tuning. That branch was unreachable until the
+  // tuning menu shipped; without this the mode just looks broken.
+  const voicingsUnavailable = mode === 'chords' && tuningId !== 'standard'
 
   const anchorPc   = anchor?.pc ?? root
   const anchorName = getPitchName(anchorPc, 'auto', root)
@@ -155,7 +161,11 @@ export function FretboardToolbar({ onHearScale }: Props) {
         fontSize: '12px', lineHeight: 1.5, color: '#8a7f72',
       }}>
         <span style={{ fontWeight: 700, color: MODE_ACCENT[mode].fg }}>{modeLabel}</span>
-        <span>— {hint}</span>
+        {voicingsUnavailable
+          ? <span style={{ color: '#f0cf95' }}>
+              — voicing shapes are standard-tuning fingerings, so there are none to show in this tuning. Switch back to Standard (EADGBe) to see them.
+            </span>
+          : <span>— {hint}</span>}
       </div>
 
       {mode === 'intervals' && (

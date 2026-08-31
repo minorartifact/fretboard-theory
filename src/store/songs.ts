@@ -128,6 +128,9 @@ export const useSongsStore = create<SongsState & SongsActions>((set, get) => ({
       activeStep: song.steps.length > 0 ? 0 : null,
       bpm:        song.bpm,
       loop:       song.loop,
+      // clear() above stashed the outgoing progression for undo. Loading a song
+      // is not a clear, so that offer would restore the wrong thing.
+      lastCleared: null,
     })
   },
 }))
