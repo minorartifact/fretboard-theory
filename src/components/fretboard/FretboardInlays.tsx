@@ -50,7 +50,7 @@ export function FretboardInlays({ fretCount, neckTopY, neckBottomY }: Props) {
         y={numY}
         textAnchor="middle"
         dominantBaseline="central"
-        fill="#574d42"
+        fill="#8a7f72"
         fontSize={11}
         fontFamily="'JetBrains Mono', monospace"
         fontWeight={600}

@@ -6,6 +6,14 @@ import { SEMITONE_TO_DEGREE } from '../../theory/constants'
 
 const ANCHOR_STROKE = '#a98ae0'
 
+/** Dimming levels. Nothing below HIT_FLOOR accepts pointer events. */
+const DIM_FLOOR     = 0.3    // out-of-scale notes, always legible
+const HIT_FLOOR     = 0.2    // below this a dot is decoration, not a target
+const OUT_OF_WINDOW = 0.14
+const UNLIT         = 0.1
+const CHORD_DIM     = 0.16
+const VOICING_DIM   = 0.07
+
 interface Props {
   annotation:    NoteAnnotation
   x:             number
@@ -13,7 +21,6 @@ interface Props {
   chordActive:   boolean
   hoverPc:       PitchClass | null
   inWindow:      boolean
-  identify:      boolean
   isPinned:      boolean
   isFlash:       boolean
   voicingColor:  string | null
@@ -34,7 +41,7 @@ interface Props {
 
 export function FretboardCell({
   annotation, x, y, chordActive,
-  hoverPc, inWindow, identify, isPinned, isFlash, voicingColor, voicingMode,
+  hoverPc, inWindow, isPinned, isFlash, voicingColor, voicingMode,
   intervalsLive, intervalLit, intervalLabel, isTonic, isAnchor,
   cellId, ariaLabel, isFocused, showFocusRing,
   onPointerDown, onMouseEnter, onMouseLeave,
@@ -48,6 +55,23 @@ export function FretboardCell({
   // it lands outside the active scale, where it would otherwise be a faint speck.
   const showFullDot = annotation.highlighted || intervalLit || isAnchor || isTonic
 
+  // ── One dimming rule for the whole cell ──────────────────────────────────
+  // Out-of-scale dots hold DIM_FLOOR instead of fading to a 0.05 speck, and
+  // anything that still lands under HIT_FLOOR gives up its pointer events —
+  // tapping a note you cannot see used to play it anyway.
+  const dimmedByChord = chordActive && !isChordTone(annotation.role)
+
+  const dotOpacity = (() => {
+    if (isPinned || isAnchor) return 1
+    if (!inWindow)            return OUT_OF_WINDOW
+    if (!showFullDot)         return DIM_FLOOR
+    if (intervalsLive)        return (intervalLit || isTonic) ? 1 : UNLIT
+    if (dimmedByChord)        return voicingMode ? VOICING_DIM : CHORD_DIM
+    return 1
+  })()
+
+  const interactive = dotOpacity >= HIT_FLOOR
+
   return (
     <g>
       {showFullDot ? (() => {
@@ -57,21 +81,9 @@ export function FretboardCell({
         const fill     = degreeFill(degLabel)
         const txtColor = degreeTextColor(degLabel)
         const showRing = annotation.semitones === 0
-        const dimmed   = chordActive && !isChordTone(annotation.role)
-
-        // An interval selection owns the dimming outright: a lit note stays fully
-        // visible even when an active chord would otherwise dim it away. The tonic
-        // is never dimmed by a selection — it is the reference the intervals are
-        // heard against.
-        let opacity: number
-        if (isPinned || isAnchor)  opacity = 1
-        else if (!inWindow)        opacity = 0.14
-        else if (intervalsLive)    opacity = (intervalLit || isTonic) ? 1 : 0.1
-        else if (dimmed)           opacity = voicingMode ? 0.07 : 0.16
-        else                       opacity = 1
 
         return (
-          <g opacity={opacity}>
+          <g opacity={dotOpacity}>
             {showRing && (
               <circle cx={x} cy={y} r={L.dotRadius + 3.5} fill="none" stroke="rgba(255,255,255,.92)" strokeWidth={2.5} />
             )}
@@ -88,16 +100,10 @@ export function FretboardCell({
           </g>
         )
       })() : (() => {
-        // Non-scale note: small faint dot — more visible in identify mode
-        let opacity: number
-        if (isPinned)         opacity = 1
-        else if (!inWindow)   opacity = 0.07
-        else if (intervalsLive) opacity = 0.05
-        else if (voicingMode) opacity = 0.05
-        else                  opacity = identify ? 0.3 : 0.2
-
+        // Non-scale note: small dot, held at the shared floor so it never
+        // becomes an invisible-but-clickable speck.
         return (
-          <g opacity={opacity}>
+          <g opacity={dotOpacity}>
             <circle
               cx={x} cy={y}
               r={isPinned ? L.dotRadius : 6}
@@ -159,7 +165,11 @@ export function FretboardCell({
         aria-label={ariaLabel}
         cx={x} cy={y} r={19}
         fill="transparent"
-        style={{ cursor: 'pointer', outline: 'none' }}
+        style={{
+          cursor: interactive ? 'pointer' : 'default',
+          outline: 'none',
+          pointerEvents: interactive ? 'auto' : 'none',
+        }}
         onMouseEnter={onMouseEnter}
         onMouseLeave={onMouseLeave}
         onPointerDown={onPointerDown}

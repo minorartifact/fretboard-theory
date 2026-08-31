@@ -28,9 +28,9 @@ export function ChordQualitySelector() {
         {chordQualityId && (
           <button
             onClick={() => setChordQualityId(null)}
-            style={{ fontSize: '10px', color: '#574d42', background: 'none', border: 'none', cursor: 'pointer', fontFamily: 'inherit', transition: 'color .12s' }}
+            style={{ fontSize: '11px', color: '#8a7f72', background: 'none', border: 'none', cursor: 'pointer', fontFamily: 'inherit', transition: 'color .12s' }}
             onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.color = '#b3a89a' }}
-            onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.color = '#574d42' }}
+            onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.color = '#8a7f72' }}
           >
             clear
           </button>
@@ -42,7 +42,7 @@ export function ChordQualitySelector() {
           const qualities = ids.map(id => CHORD_QUALITIES_BY_ID[id]).filter(Boolean)
           return (
             <div key={label}>
-              <p style={{ fontSize: '10px', fontWeight: 600, letterSpacing: '.13em', textTransform: 'uppercase', color: '#574d42', marginBottom: '6px', paddingLeft: '2px' }}>
+              <p style={{ fontSize: '11px', fontWeight: 600, letterSpacing: '.13em', textTransform: 'uppercase', color: '#8a7f72', marginBottom: '6px', paddingLeft: '2px' }}>
                 {label}
               </p>
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '5px' }}>

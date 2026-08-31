@@ -17,7 +17,7 @@ function countNeckPositions(pc: number, tuning: Tuning, fretCount: number): numb
 }
 
 const SECTION_LABEL: React.CSSProperties = {
-  fontSize: '10px', fontWeight: 700, letterSpacing: '.16em',
+  fontSize: '11px', fontWeight: 700, letterSpacing: '.16em',
   textTransform: 'uppercase', color: '#6b6258', flexShrink: 0,
 }
 
@@ -35,12 +35,40 @@ function NoteChip({ note, root }: { note: PinnedNote; root: PitchClass }) {
   )
 }
 
+/** A keyboard hint that looks like the key it names. */
+function Keycap({ keys, label }: { keys: string; label: string }) {
+  return (
+    <span style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', flexShrink: 0 }}>
+      <kbd style={{
+        display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+        minWidth: '20px', height: '20px', padding: '0 6px',
+        background: '#1b150f', border: '1px solid #3a2e22', borderRadius: '5px',
+        color: '#c7bcae', fontFamily: "'JetBrains Mono', monospace",
+        fontSize: '11px', fontWeight: 700,
+      }}>
+        {keys}
+      </kbd>
+      <span style={{ fontSize: '12px', color: '#8a7f72' }}>{label}</span>
+    </span>
+  )
+}
+
+/** The keyboard hints that used to be buried in a sentence under the neck. */
+const HINTS = (
+  <span style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: '14px', flexWrap: 'wrap' }}>
+    <Keycap keys="2–9" label="spotlight" />
+    <Keycap keys="0" label="clear" />
+    <Keycap keys="?" label="shortcuts" />
+  </span>
+)
+
 export function FretboardReadout() {
   const hoverPc   = useInteractiveStore(s => s.hoverPc)
   const identify  = useInteractiveStore(s => s.mode === 'identify')
   const pinned    = useInteractiveStore(s => s.pinned)
   const clearPins = useInteractiveStore(s => s.clearPins)
   const root      = useTheoryStore(s => s.root)
+  const scale     = useTheoryStore(s => s.scale)
   const tuning    = useFretboardStore(s => s.tuning)
   const fretCount = useFretboardStore(s => s.fretCount)
 
@@ -115,24 +143,31 @@ export function FretboardReadout() {
   }
 
   if (!identify) {
-    if (hoverPc == null) {
-      return row(<>
-        <span style={SECTION_LABEL}>Tip</span>
-        <span style={{ fontSize: '14px', color: '#9a8f82' }}>
-          Tap any fret to hear its true pitch · hover a note to light up its octaves · press 2-9 to spotlight a scale degree.
-        </span>
-      </>)
-    }
-    const count    = countNeckPositions(hoverPc, tuning, fretCount)
-    const noteName = getPitchName(hoverPc, 'auto', root)
+    // F7: this band is the most prominent surface after the neck, and its
+    // default state used to be a fixed sentence that said nothing about the
+    // key. With no note under the cursor it describes the tonic instead.
+    const shownPc: PitchClass = hoverPc ?? root
+    const hovering  = hoverPc != null
+    const count     = countNeckPositions(shownPc, tuning, fretCount)
+    const noteName  = getPitchName(shownPc, 'auto', root)
+    const offset    = ((shownPc - root) + 12) % 12
+    const scaleIdx  = scale ? scale.pattern.indexOf(offset) : -1
+    const degLabel  = scaleIdx >= 0 && scale ? scale.degrees[scaleIdx] : null
+    const rootName  = getPitchName(root, 'auto', root)
+
+    const detail = offset === 0
+      ? `the tonic · every ${noteName} on the neck`
+      : `${degLabel ? `degree ${degLabel} · ` : ''}${INTERVAL_NAMES[offset]} above ${rootName}`
+
     return row(<>
-      <span style={SECTION_LABEL}>Hovering</span>
+      <span style={SECTION_LABEL}>{hovering ? 'Under cursor' : 'Key'}</span>
       <span style={{ fontSize: '30px', fontWeight: 800, color: '#f1ebe2', fontFamily: "'JetBrains Mono', monospace" }}>
         {noteName}
       </span>
       <span style={{ fontSize: '14px', color: '#8a7f72' }}>
-        {count} positions on the neck · all octaves highlighted
+        {detail} · {count} position{count === 1 ? '' : 's'} on the neck
       </span>
+      {HINTS}
     </>)
   }
 

@@ -57,10 +57,10 @@ export function ProgressionCards({ handleStepClick }: Props) {
       {/* Transport header — same as normal mode */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '14px', gap: '10px', flexWrap: 'wrap' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-          <span style={{ fontSize: '10.5px', fontWeight: 700, letterSpacing: '.16em', textTransform: 'uppercase', color: '#6b6258' }}>
+          <span style={{ fontSize: '11px', fontWeight: 700, letterSpacing: '.16em', textTransform: 'uppercase', color: '#6b6258' }}>
             Progression
           </span>
-          <span style={{ fontSize: '10.5px', fontFamily: "'JetBrains Mono', monospace", color: '#574d42', fontWeight: 600 }}>
+          <span style={{ fontSize: '11px', fontFamily: "'JetBrains Mono', monospace", color: '#8a7f72', fontWeight: 600 }}>
             {progPos}
           </span>
         </div>
@@ -156,7 +156,7 @@ export function ProgressionCards({ handleStepClick }: Props) {
               <span style={{ position: 'absolute', top: 0, left: '14px', right: '14px', height: '3px', borderRadius: '0 0 2px 2px', background: isPlay ? '#e0a85a' : 'transparent' }} />
 
               {/* Step number */}
-              <span style={{ position: 'absolute', top: '6px', left: '10px', fontSize: '9px', fontFamily: "'JetBrains Mono', monospace", fontWeight: 700, color: isPlay ? '#e0a85a' : '#3f352a' }}>
+              <span style={{ position: 'absolute', top: '6px', left: '10px', fontSize: '11px', fontFamily: "'JetBrains Mono', monospace", fontWeight: 700, color: isPlay ? '#e0a85a' : '#3f352a' }}>
                 {idx + 1}
               </span>
 

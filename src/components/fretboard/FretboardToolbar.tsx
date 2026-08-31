@@ -6,7 +6,8 @@ import { SEMITONE_TO_INTERVAL } from '../../theory/constants'
 import { getPitchName } from '../../theory/pitch'
 
 const SEG_BTN: React.CSSProperties = {
-  padding: '5px 10px', borderRadius: '7px', border: 'none',
+  display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+  height: '32px', padding: '0 12px', borderRadius: '7px', border: 'none',
   background: 'transparent', color: '#8a7f72', fontSize: '12px',
   fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit',
   transition: 'background .12s, color .12s', whiteSpace: 'nowrap',
@@ -21,7 +22,7 @@ const SEGMENTED: React.CSSProperties = {
 }
 
 const GROUP_LABEL: React.CSSProperties = {
-  fontSize: '10px', fontWeight: 700, letterSpacing: '.16em',
+  fontSize: '11px', fontWeight: 700, letterSpacing: '.16em',
   textTransform: 'uppercase', color: '#6b6258', flexShrink: 0,
 }
 
@@ -74,7 +75,9 @@ export function FretboardToolbar({ onHearScale }: Props) {
 
   const anchorPc   = anchor?.pc ?? root
   const anchorName = getPitchName(anchorPc, 'auto', root)
-  const hint       = MODES.find(m => m.id === mode)?.hint ?? ''
+  const activeMode = MODES.find(m => m.id === mode)
+  const hint       = activeMode?.hint ?? ''
+  const modeLabel  = activeMode?.label ?? ''
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
@@ -119,20 +122,14 @@ export function FretboardToolbar({ onHearScale }: Props) {
           title={hasScale ? 'Play the scale through the current position' : 'Pick a scale first'}
           style={{
             ...ACTION_BTN,
-            color: hasScale ? '#b3a89a' : '#4a4136',
+            color: hasScale ? '#b3a89a' : '#a89d90',
             cursor: hasScale ? 'pointer' : 'not-allowed',
           }}
         >
           ▶  Hear scale
         </button>
 
-        {/* Flexible filler — truncates instead of wrapping the row. */}
-        <span style={{
-          flex: 1, minWidth: 0, fontSize: '12px', color: '#6b6258',
-          overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
-        }}>
-          {hint}
-        </span>
+        <span style={{ flex: 1, minWidth: 0 }} />
 
         <button
           onClick={toggleFullscreen}
@@ -146,6 +143,17 @@ export function FretboardToolbar({ onHearScale }: Props) {
         >
           {fullscreen ? '⤡' : '⤢'}
         </button>
+      </div>
+
+      {/* The mode hint gets a row of its own. As a flex:1 filler it was the
+          first thing to ellipsis away on a tablet, and it is the only
+          explanation of the four modes anywhere in the app. */}
+      <div style={{
+        display: 'flex', alignItems: 'baseline', gap: '7px', flexWrap: 'wrap',
+        fontSize: '12px', lineHeight: 1.5, color: '#8a7f72',
+      }}>
+        <span style={{ fontWeight: 700, color: MODE_ACCENT[mode].fg }}>{modeLabel}</span>
+        <span>— {hint}</span>
       </div>
 
       {mode === 'intervals' && (

@@ -63,7 +63,7 @@ export function CircleOfFifths() {
 
       const inSc = scale ? isInScale(pc, root, scale) : false
       let fill      = '#1a140f'
-      let textColor = '#574d42'
+      let textColor = '#8a7f72'
 
       if (inSc && scale) {
         const degLabel = getScaleDegreeLabel(pc, root, scale) ?? '1'
@@ -154,7 +154,7 @@ export function CircleOfFifths() {
         <text
           x={CX} y={CY + 14}
           textAnchor="middle" dominantBaseline="central"
-          fill="#6b6258" fontSize={9}
+          fill="#6b6258" fontSize={11}
           fontFamily="'Hanken Grotesk', sans-serif"
           fontWeight={700} letterSpacing="2px"
         >

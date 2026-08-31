@@ -28,11 +28,11 @@ export function SaveSongForm({ control, marginBottom }: Props) {
         onClick={commit}
         disabled={!canSave}
         className={canSave ? 'h-icon' : ''}
-        style={{ height: '28px', padding: '0 12px', borderRadius: '7px', border: '1px solid #3a2e22', background: canSave ? '#231b13' : '#1b150f', color: canSave ? '#ede6dd' : '#4a4136', cursor: canSave ? 'pointer' : 'not-allowed', fontSize: '11.5px', fontWeight: 700, fontFamily: 'inherit', transition: 'background .12s, color .12s' }}
+        style={{ height: '28px', padding: '0 12px', borderRadius: '7px', border: '1px solid #3a2e22', background: canSave ? '#231b13' : '#1b150f', color: canSave ? '#ede6dd' : '#a89d90', cursor: canSave ? 'pointer' : 'not-allowed', fontSize: '11.5px', fontWeight: 700, fontFamily: 'inherit', transition: 'background .12s, color .12s' }}
       >
         Save
       </button>
-      <button onClick={cancel} className="h-ghost" style={{ height: '28px', padding: '0 8px', background: 'none', border: 'none', color: '#574d42', cursor: 'pointer', fontSize: '13px', fontFamily: 'inherit', transition: 'color .12s' }}>×</button>
+      <button onClick={cancel} className="h-ghost" style={{ height: '28px', padding: '0 8px', background: 'none', border: 'none', color: '#8a7f72', cursor: 'pointer', fontSize: '13px', fontFamily: 'inherit', transition: 'color .12s' }}>×</button>
     </div>
   )
 }

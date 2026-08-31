@@ -7,7 +7,7 @@ export function SavedSongsPanel() {
 
   if (songs.length === 0) {
     return (
-      <p style={{ fontSize: '11.5px', color: '#4a4136', lineHeight: 1.6, margin: 0 }}>
+      <p style={{ fontSize: '11.5px', color: '#a89d90', lineHeight: 1.6, margin: 0 }}>
         No saved songs yet. Build a progression and hit Save.
       </p>
     )
@@ -52,9 +52,9 @@ export function SavedSongsPanel() {
               {song.name}
             </span>
             <span style={{
-              display: 'block', fontSize: '10.5px',
+              display: 'block', fontSize: '11px',
               fontFamily: "'JetBrains Mono', monospace",
-              color: '#4a4136', marginTop: '1px',
+              color: '#a89d90', marginTop: '1px',
             }}>
               {song.steps.length} chords · {song.bpm} BPM
             </span>

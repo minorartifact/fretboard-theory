@@ -8,10 +8,12 @@ const MODES: { value: LabelMode; label: string }[] = [
 ]
 
 export function LabelModeToggle() {
-  const labelMode    = useViewStore(s => s.labelMode)
-  const setLabelMode = useViewStore(s => s.setLabelMode)
+  const labelMode       = useViewStore(s => s.labelMode)
+  const setLabelMode    = useViewStore(s => s.setLabelMode)
+  const toggleShortcuts = useViewStore(s => s.toggleShortcuts)
 
   return (
+    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
     <div style={{ display: 'flex', gap: '4px', background: '#16120e', border: '1px solid #2a221b', borderRadius: '11px', padding: '4px' }}>
       {MODES.map(({ value, label }) => (
         <button
@@ -36,6 +38,26 @@ export function LabelModeToggle() {
           {label}
         </button>
       ))}
+    </div>
+
+    {/* F10: Space, F, 0 and 2-9 all work, and the only way to find them was
+        guessing "?". The overlay already existed; now it has a way in. */}
+    <button
+      onClick={toggleShortcuts}
+      title="Keyboard shortcuts (?)"
+      aria-label="Keyboard shortcuts"
+      className="h-icon"
+      style={{
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+        width: '34px', height: '34px', flexShrink: 0,
+        background: '#16120e', border: '1px solid #2a221b', borderRadius: '11px',
+        color: '#8a7f72', fontSize: '14px', fontWeight: 700,
+        cursor: 'pointer', fontFamily: 'inherit',
+        transition: 'background .12s, color .12s',
+      }}
+    >
+      ?
+    </button>
     </div>
   )
 }

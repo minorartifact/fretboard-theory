@@ -296,7 +296,6 @@ export function FretboardView() {
                   chordActive={chordActive}
                   hoverPc={hoverPc}
                   inWindow={inWindow(fret)}
-                  identify={identify}
                   isPinned={pinned.some(p => p.string === si && p.fret === fret)}
                   isFlash={flashId === key}
                   voicingColor={voicingCellColor.get(key) ?? null}

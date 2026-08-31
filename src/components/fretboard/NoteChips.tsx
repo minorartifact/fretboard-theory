@@ -41,8 +41,8 @@ export function NoteChips() {
 
   return (
     <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', alignItems: 'center' }}>
-      <span style={{ fontSize: '10.5px', fontWeight: 700, letterSpacing: '.16em', textTransform: 'uppercase', color: '#6b6258', marginRight: '4px' }}>
-        Notes
+      <span style={{ fontSize: '11px', fontWeight: 700, letterSpacing: '.16em', textTransform: 'uppercase', color: '#6b6258', marginRight: '4px' }}>
+        Spotlight
       </span>
       {scale.pattern.map((semitones, i) => {
         const pc       = ((root + semitones) % 12) as PitchClass
@@ -82,10 +82,30 @@ export function NoteChips() {
           transition: 'opacity .15s, outline-color .12s',
         } as const
 
+        // F3: nothing marked these as pressable, and the 2-9 mapping they mirror
+        // was only mentioned in the tip line under the neck. The keycap puts the
+        // shortcut on the control itself; the tonic reads as locked instead.
         const face = (
           <>
             <span>{noteName}</span>
-            <span style={{ fontSize: '10px', opacity: 0.72, fontWeight: 600 }}>{degLabel}</span>
+            <span style={{ fontSize: '11px', opacity: 0.72, fontWeight: 600 }}>{degLabel}</span>
+            {isTonic ? (
+              <span style={{
+                fontSize: '11px', fontWeight: 700, letterSpacing: '.1em',
+                opacity: 0.62, marginLeft: '1px',
+              }}>
+                TONIC
+              </span>
+            ) : shortcut && (
+              <span style={{
+                display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+                minWidth: '15px', height: '15px', borderRadius: '4px',
+                background: 'rgba(0,0,0,.28)', color: 'inherit',
+                fontSize: '11px', fontWeight: 700, opacity: 0.85, marginLeft: '1px',
+              }}>
+                {shortcut}
+              </span>
+            )}
           </>
         )
 

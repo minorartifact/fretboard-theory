@@ -29,7 +29,7 @@ function CollapsibleSection({ label, defaultOpen = true, flex = false, children 
           cursor: 'pointer', fontFamily: 'inherit',
         }}
       >
-        <span style={{ fontSize: '10px', fontWeight: 700, letterSpacing: '.16em', textTransform: 'uppercase', color: '#6b6258' }}>
+        <span style={{ fontSize: '11px', fontWeight: 700, letterSpacing: '.16em', textTransform: 'uppercase', color: '#6b6258' }}>
           {label}
         </span>
         <span style={{

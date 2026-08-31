@@ -75,7 +75,7 @@ textarea { resize: vertical; }
   --text-secondary:#b3a89a;
   --text-muted:    #8a7f72;
   --text-dimmer:   #6b6258;
-  --text-dimmest:  #574d42;
+  --text-dimmest:  #8a7f72;
 }
 
 /* Keyboard focus ring — visible only on keyboard navigation */

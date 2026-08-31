@@ -15,7 +15,7 @@ import { playChord } from '../../audio/chordSynth'
 
 const BTN: React.CSSProperties = {
   display: 'flex', alignItems: 'center', justifyContent: 'center',
-  width: '28px', height: '28px', fontSize: '11px',
+  width: '36px', height: '32px', fontSize: '12px',
   color: '#9a8f82', background: '#1b150f',
   border: '1px solid #2a221b', borderRadius: '8px',
   cursor: 'pointer', fontFamily: 'inherit',
@@ -144,7 +144,7 @@ export function ProgressionPanel() {
       <>
       {/* ── Left: diatonic chord palette ─────────────────────────────── */}
       <div style={{ flex: '1 1 430px', minWidth: 0 }}>
-        <div style={{ fontSize: '10.5px', fontWeight: 700, letterSpacing: '.16em', textTransform: 'uppercase', color: '#6b6258', marginBottom: '12px' }}>
+        <div style={{ fontSize: '11px', fontWeight: 700, letterSpacing: '.16em', textTransform: 'uppercase', color: '#6b6258', marginBottom: '12px' }}>
           Diatonic chords
           {ec !== 'new' ? (
             <span style={{ color: '#e0a85a', fontWeight: 600, letterSpacing: '.02em', textTransform: 'none', marginLeft: '8px' }}>
@@ -195,7 +195,7 @@ export function ProgressionPanel() {
 
             {/* Secondary dominants row */}
             <div style={{ marginTop: '10px' }}>
-              <div style={{ fontSize: '9.5px', fontWeight: 700, letterSpacing: '.14em', textTransform: 'uppercase', color: '#4a4136', marginBottom: '7px' }}>
+              <div style={{ fontSize: '11px', fontWeight: 700, letterSpacing: '.14em', textTransform: 'uppercase', color: '#a89d90', marginBottom: '7px' }}>
                 Secondary dominants
               </div>
               <div style={{ display: 'flex', gap: '7px', flexWrap: 'wrap' }}>
@@ -238,7 +238,7 @@ export function ProgressionPanel() {
             </div>
           </>
         ) : (
-          <div style={{ fontSize: '12px', color: '#4a4136' }}>
+          <div style={{ fontSize: '12px', color: '#a89d90' }}>
             {scale ? 'Diatonic chords require a 7-tone scale.' : 'Select a scale to see diatonic chords.'}
           </div>
         )}
@@ -250,10 +250,10 @@ export function ProgressionPanel() {
         {/* Header row */}
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px', gap: '10px', flexWrap: 'wrap' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-            <span style={{ fontSize: '10.5px', fontWeight: 700, letterSpacing: '.16em', textTransform: 'uppercase', color: '#6b6258' }}>
+            <span style={{ fontSize: '11px', fontWeight: 700, letterSpacing: '.16em', textTransform: 'uppercase', color: '#6b6258' }}>
               Progression
             </span>
-            <span style={{ fontSize: '10.5px', fontFamily: "'JetBrains Mono', monospace", color: '#574d42', fontWeight: 600 }}>
+            <span style={{ fontSize: '11px', fontFamily: "'JetBrains Mono', monospace", color: '#8a7f72', fontWeight: 600 }}>
               {progPos}
             </span>
             <button
@@ -293,10 +293,11 @@ export function ProgressionPanel() {
                 color: loop ? '#e0a85a' : '#6b6258',
                 background: loop ? 'rgba(224,168,90,.12)' : '#1b150f',
                 border: `1px solid ${loop ? 'rgba(224,168,90,.4)' : '#2a221b'}`,
-                fontSize: '14px',
+                fontSize: '12.5px', fontWeight: 700,
+                width: 'auto', padding: '0 11px', gap: '5px',
               }}
             >
-              &#x21BB;
+              &#x21BB; Loop
             </button>
             <button
               onClick={toggleMetronome}
@@ -308,23 +309,24 @@ export function ProgressionPanel() {
                 color: metronome ? '#e0a85a' : '#6b6258',
                 background: metronome ? 'rgba(224,168,90,.12)' : '#1b150f',
                 border: `1px solid ${metronome ? 'rgba(224,168,90,.4)' : '#2a221b'}`,
-                fontSize: '12px', fontWeight: 800,
+                fontSize: '12.5px', fontWeight: 700,
+                width: 'auto', padding: '0 11px', gap: '5px',
               }}
             >
-              M
+              &#x2669; Click
             </button>
             {/* BPM control */}
             <div style={{ display: 'flex', alignItems: 'center', gap: '2px', marginLeft: '4px', background: '#1b150f', border: '1px solid #2a221b', borderRadius: '8px', padding: '0 3px' }}>
-              <button onClick={() => setBpm(bpm - 5)} title="Decrease BPM" className="h-ghost" style={{ width: '20px', height: '26px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '15px', color: '#8a7f72', background: 'transparent', border: 'none', cursor: 'pointer', fontFamily: 'inherit', transition: 'color .12s' }}>&#x2212;</button>
-              <span style={{ fontSize: '11px', fontFamily: "'JetBrains Mono', monospace", fontWeight: 600, color: '#c7bcae', minWidth: '52px', textAlign: 'center' }}>{bpm} BPM</span>
-              <button onClick={() => setBpm(bpm + 5)} title="Increase BPM" className="h-ghost" style={{ width: '20px', height: '26px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '15px', color: '#8a7f72', background: 'transparent', border: 'none', cursor: 'pointer', fontFamily: 'inherit', transition: 'color .12s' }}>+</button>
+              <button onClick={() => setBpm(bpm - 5)} title="Decrease BPM" className="h-ghost" style={{ width: '22px', height: '32px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '15px', color: '#8a7f72', background: 'transparent', border: 'none', cursor: 'pointer', fontFamily: 'inherit', transition: 'color .12s' }}>&#x2212;</button>
+              <span style={{ fontSize: '12.5px', fontFamily: "'JetBrains Mono', monospace", fontWeight: 600, color: '#c7bcae', minWidth: '58px', textAlign: 'center' }}>{bpm} BPM</span>
+              <button onClick={() => setBpm(bpm + 5)} title="Increase BPM" className="h-ghost" style={{ width: '22px', height: '32px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '15px', color: '#8a7f72', background: 'transparent', border: 'none', cursor: 'pointer', fontFamily: 'inherit', transition: 'color .12s' }}>+</button>
             </div>
             {progEmpty && lastCleared ? (
               <button onClick={undoClear} title={`Restore the ${lastCleared.length} chords you just cleared`} className="h-ghost" style={{ fontSize: '11.5px', color: '#e0a85a', background: 'transparent', border: 'none', cursor: 'pointer', fontWeight: 700, fontFamily: 'inherit', marginLeft: '4px', transition: 'color .12s' }}>
                 Undo clear
               </button>
             ) : (
-              <button onClick={clear} disabled={progEmpty} title="Clear progression" className={progEmpty ? '' : 'h-ghost'} style={{ fontSize: '11.5px', color: progEmpty ? '#4a4136' : '#8a7f72', background: 'transparent', border: 'none', cursor: progEmpty ? 'default' : 'pointer', fontWeight: 600, fontFamily: 'inherit', marginLeft: '4px', transition: 'color .12s' }}>
+              <button onClick={clear} disabled={progEmpty} title="Clear progression" className={progEmpty ? '' : 'h-ghost'} style={{ fontSize: '11.5px', color: progEmpty ? '#a89d90' : '#8a7f72', background: 'transparent', border: 'none', cursor: progEmpty ? 'default' : 'pointer', fontWeight: 600, fontFamily: 'inherit', marginLeft: '4px', transition: 'color .12s' }}>
                 Clear
               </button>
             )}
@@ -350,7 +352,41 @@ export function ProgressionPanel() {
           background: '#100c09', border: '1px solid #221b14', borderRadius: '11px',
         }}>
           {progEmpty && ec === 'new' ? (
-            <NewSlotCard isFocused onClick={() => {}} />
+            /* F9: the empty state used to be a wordless dashed "+", with the
+               presets that would actually get a player started stranded in a
+               row below the panel. They live here now, where the track is. */
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '9px', width: '100%' }}>
+              <div style={{ fontSize: '13px', fontWeight: 700, color: '#c7bcae' }}>
+                No chords yet
+              </div>
+              <div style={{ fontSize: '12px', color: '#8a7f72', lineHeight: 1.5 }}>
+                Tap a numeral on the left, or start from a familiar progression:
+              </div>
+              <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap', marginTop: '2px' }}>
+                {COMMON_PROGRESSIONS.map(preset => {
+                  const ok = preset.steps.every(st => st.degree <= scaleLen)
+                  return (
+                    <button
+                      key={preset.name}
+                      onClick={() => { if (ok) { loadPreset(preset); setEditCursor('new') } }}
+                      title={ok ? `Load: ${preset.name}` : 'Requires a 7-tone scale'}
+                      className={ok ? 'h-chip' : ''}
+                      disabled={!ok}
+                      style={{
+                        fontSize: '12px', fontFamily: "'JetBrains Mono', monospace", fontWeight: 600,
+                        color: ok ? '#c7bcae' : '#6b6258',
+                        background: '#1b150f', border: '1px solid #2a221b', borderRadius: '7px',
+                        height: '32px', padding: '0 12px',
+                        cursor: ok ? 'pointer' : 'not-allowed',
+                        transition: 'background .12s, border-color .12s, color .12s',
+                      }}
+                    >
+                      {preset.name}
+                    </button>
+                  )
+                })}
+              </div>
+            </div>
           ) : (
             <>
               {steps.map((step, idx) => {
@@ -403,7 +439,7 @@ export function ProgressionPanel() {
                     }} />
                     <span style={{
                       position: 'absolute', top: '5px', left: '8px',
-                      fontSize: '9px', fontFamily: "'JetBrains Mono', monospace", fontWeight: 700,
+                      fontSize: '11px', fontFamily: "'JetBrains Mono', monospace", fontWeight: 700,
                       color: isPlay ? '#e0a85a' : '#3f352a',
                     }}>
                       {idx + 1}
@@ -441,32 +477,6 @@ export function ProgressionPanel() {
               />
             </>
           )}
-        </div>
-
-        {/* Presets row */}
-        <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap', marginTop: '11px' }}>
-          {COMMON_PROGRESSIONS.map(p => {
-            const ok = p.steps.every(st => st.degree <= scaleLen)
-            return (
-              <button
-                key={p.name}
-                onClick={() => { if (ok) { loadPreset(p); setEditCursor('new') } }}
-                title={ok ? `Load: ${p.name}` : 'Requires a 7-tone scale'}
-                className={ok ? 'h-chip' : ''}
-                style={{
-                  fontSize: '11.5px', fontFamily: "'JetBrains Mono', monospace", fontWeight: 600,
-                  color: ok ? '#9a8f82' : '#3f352a',
-                  background: '#1b150f', border: '1px solid #2a221b', borderRadius: '7px',
-                  padding: '5px 10px',
-                  cursor: ok ? 'pointer' : 'not-allowed',
-                  opacity: ok ? 1 : 0.5,
-                  transition: 'background .12s, border-color .12s, color .12s',
-                }}
-              >
-                {p.name}
-              </button>
-            )
-          })}
         </div>
 
       </div>

@@ -60,7 +60,7 @@ export function ShortcutsOverlay() {
         }}
       >
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <span style={{ fontSize: '10.5px', fontWeight: 700, letterSpacing: '.16em', textTransform: 'uppercase', color: '#6b6258' }}>
+          <span style={{ fontSize: '11px', fontWeight: 700, letterSpacing: '.16em', textTransform: 'uppercase', color: '#6b6258' }}>
             Keyboard shortcuts
           </span>
           <button
@@ -75,7 +75,7 @@ export function ShortcutsOverlay() {
 
         {GROUPS.map(group => (
           <div key={group.title} style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-            <span style={{ fontSize: '10px', fontWeight: 700, letterSpacing: '.14em', textTransform: 'uppercase', color: '#534a40' }}>
+            <span style={{ fontSize: '11px', fontWeight: 700, letterSpacing: '.14em', textTransform: 'uppercase', color: '#534a40' }}>
               {group.title}
             </span>
             {group.rows.map(([key, what]) => (

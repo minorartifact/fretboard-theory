@@ -9,10 +9,11 @@ import { NoteChips } from './components/fretboard/NoteChips'
 import { TheoryPanel } from './components/panels/TheoryPanel'
 import { ProgressionPanel } from './components/progression/ProgressionPanel'
 import { LabelModeToggle } from './components/ui/LabelModeToggle'
+import { NeckMenus } from './components/ui/NeckMenus'
+import { KeyStrip } from './components/theory/KeyStrip'
 import { ShortcutsOverlay } from './components/ui/ShortcutsOverlay'
 import { useTheoryStore } from './store/theory'
 import { useProgressionStore } from './store/progression'
-import { useFretboardStore } from './store/fretboard'
 import { useViewStore } from './store/view'
 import { useInteractiveStore } from './store/interactive'
 import { getPitchName } from './theory/pitch'
@@ -26,8 +27,6 @@ function MainHeader({ narrow }: { narrow: boolean }) {
   const chordQualityId = useTheoryStore(s => s.chordQualityId)
   const progSteps      = useProgressionStore(s => s.steps)
   const activeStep     = useProgressionStore(s => s.activeStep)
-  const tuning         = useFretboardStore(s => s.tuning)
-  const fretCount      = useFretboardStore(s => s.fretCount)
 
   const rootName = getPitchName(root, 'auto', root)
 
@@ -53,8 +52,6 @@ function MainHeader({ narrow }: { narrow: boolean }) {
     : scale
       ? `${scale.category} · ${scale.pattern.length} notes · spelled from ${rootName}`
       : ''
-
-  const meta = `${tuning.name} · ${fretCount} frets`
 
   return (
     <header style={{ padding: '28px 40px 0', display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '24px', flexShrink: 0 }}>
@@ -87,12 +84,11 @@ function MainHeader({ narrow }: { narrow: boolean }) {
             {sub}
           </div>
         )}
+        <KeyStrip />
       </div>
       <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '11px', flexShrink: 0 }}>
         <LabelModeToggle />
-        <div style={{ fontSize: '11.5px', color: '#6b6258', fontFamily: "'JetBrains Mono', monospace", letterSpacing: '.02em' }}>
-          {meta}
-        </div>
+        <NeckMenus />
       </div>
     </header>
   )
@@ -115,10 +111,10 @@ function CollapsedProgressionBar() {
       }}
       className="h-ghost"
     >
-      <span style={{ fontSize: '10.5px', fontWeight: 700, letterSpacing: '.16em', textTransform: 'uppercase', color: '#6b6258' }}>
+      <span style={{ fontSize: '11px', fontWeight: 700, letterSpacing: '.16em', textTransform: 'uppercase', color: '#6b6258' }}>
         Progression
       </span>
-      <span style={{ fontSize: '10.5px', fontFamily: "'JetBrains Mono', monospace", color: '#574d42', fontWeight: 600 }}>
+      <span style={{ fontSize: '11px', fontFamily: "'JetBrains Mono', monospace", color: '#8a7f72', fontWeight: 600 }}>
         {stepCount ? `${stepCount} steps` : 'empty'}
       </span>
       <span style={{ marginLeft: 'auto', fontSize: '12px', color: '#4a4540' }}>▴</span>
