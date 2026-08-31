@@ -4,6 +4,7 @@ import { useFretboardStore } from '../../store/fretboard'
 import { getPitchName } from '../../theory/pitch'
 import { detectInterval, detectChord, INTERVAL_NAMES } from '../../theory/identify'
 import { intervalPitchClasses } from '../../theory/intervals'
+import { Keycap } from '../ui/Keycap'
 import type { PitchClass, Tuning } from '../../theory/types'
 
 function countNeckPositions(pc: number, tuning: Tuning, fretCount: number): number {
@@ -35,19 +36,11 @@ function NoteChip({ note, root }: { note: PinnedNote; root: PitchClass }) {
   )
 }
 
-/** A keyboard hint that looks like the key it names. */
-function Keycap({ keys, label }: { keys: string; label: string }) {
+/** A keyboard hint: the key, then what it does. */
+function Hint({ keys, label }: { keys: string; label: string }) {
   return (
     <span style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', flexShrink: 0 }}>
-      <kbd style={{
-        display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-        minWidth: '20px', height: '20px', padding: '0 6px',
-        background: '#1b150f', border: '1px solid #3a2e22', borderRadius: '5px',
-        color: '#c7bcae', fontFamily: "'JetBrains Mono', monospace",
-        fontSize: '11px', fontWeight: 700,
-      }}>
-        {keys}
-      </kbd>
+      <Keycap>{keys}</Keycap>
       <span style={{ fontSize: '12px', color: '#8a7f72' }}>{label}</span>
     </span>
   )
@@ -56,9 +49,9 @@ function Keycap({ keys, label }: { keys: string; label: string }) {
 /** The keyboard hints that used to be buried in a sentence under the neck. */
 const HINTS = (
   <span style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: '14px', flexWrap: 'wrap' }}>
-    <Keycap keys="2–9" label="spotlight" />
-    <Keycap keys="0" label="clear" />
-    <Keycap keys="?" label="shortcuts" />
+    <Hint keys="2–9" label="spotlight" />
+    <Hint keys="0" label="clear" />
+    <Hint keys="?" label="shortcuts" />
   </span>
 )
 

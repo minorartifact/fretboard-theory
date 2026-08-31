@@ -2,9 +2,9 @@ import { useCallback, useMemo, useState } from 'react'
 import { useViewStore, type PaletteKind } from '../../store/view'
 import { useTheoryStore } from '../../store/theory'
 import { SCALES } from '../../theory/scales'
-import { CHORD_QUALITIES } from '../../theory/chords'
+import { CHORD_QUALITIES, getChordNotes } from '../../theory/chords'
 import { SHARP_NAMES } from '../../theory/constants'
-import { getPitchName } from '../../theory/pitch'
+import { getPitchName, getPitchNameForDegree } from '../../theory/pitch'
 import type { PitchClass } from '../../theory/types'
 
 /**
@@ -17,6 +17,8 @@ interface Item {
   id:       string
   label:    string
   meta?:    string
+  /** Concrete notes, so you can read what you would actually play. */
+  notes?:   string
   hint?:    string
   current:  boolean
   choose:   () => void
@@ -77,6 +79,11 @@ export function CommandPalette() {
         id: q.id,
         label: q.name,
         meta: q.symbol ? `${getPitchName(root, 'auto', root)}${q.symbol}` : getPitchName(root, 'auto', root),
+        // Spell each note against the degree it plays, or a diminished fifth
+        // comes out as D# rather than Eb — wrong in a theory app.
+        notes: getChordNotes({ root, quality: q })
+          .map((pc, i) => getPitchNameForDegree(pc, root, q.degreeLabels[i]))
+          .join(' '),
         hint: q.degreeLabels.join(' '),
         current: chordQualityId === q.id,
         choose: () => setQuality(q.id),
@@ -192,7 +199,12 @@ export function CommandPalette() {
                   {item.meta}
                 </span>
               )}
-              <span style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: '10px', flexShrink: 0 }}>
+              <span style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: '12px', flexShrink: 0 }}>
+                {item.notes && (
+                  <span style={{ fontSize: '12px', color: '#c7bcae', fontFamily: "'JetBrains Mono', monospace", letterSpacing: '.04em' }}>
+                    {item.notes}
+                  </span>
+                )}
                 {item.hint && (
                   <span style={{ fontSize: '11px', color: '#6b6258', fontFamily: "'JetBrains Mono', monospace" }}>{item.hint}</span>
                 )}

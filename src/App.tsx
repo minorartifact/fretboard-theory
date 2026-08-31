@@ -48,9 +48,12 @@ function MainHeader({ narrow }: { narrow: boolean }) {
     return null
   }, [root, scale, chordQualityId, progSteps, step, rootName])
 
+  // With a chord active the headline becomes the chord, so the sub line has to
+  // carry the scale name — otherwise the only thing telling you which scale you
+  // are in is the highlighted row in the sidebar.
   const headline = chordName ?? (scale?.name ?? 'No scale')
   const sub      = chordName
-    ? (scale ? `${scale.category} · ${scale.pattern.length} notes · ${chordName} over ${rootName}` : chordName)
+    ? (scale ? `${scale.name} · ${scale.pattern.length} notes · ${chordName} over ${rootName}` : chordName)
     : scale
       ? `${scale.category} · ${scale.pattern.length} notes · spelled from ${rootName}`
       : ''

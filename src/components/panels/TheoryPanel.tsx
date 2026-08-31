@@ -3,15 +3,19 @@ import { CircleOfFifths } from '../circle/CircleOfFifths'
 import { ScaleSelector } from '../theory/ScaleSelector'
 import { ChordQualitySelector } from '../theory/ChordQualitySelector'
 import { SavedSongsPanel } from '../theory/SavedSongsPanel'
+import { Keycap } from '../ui/Keycap'
 
 interface SectionProps {
   label:       string
+  /** Key that opens a quick-pick for this section, shown as a cap in the header. */
+  shortcut?:   string
+  shortcutHint?: string
   defaultOpen?: boolean
   flex?:       boolean
   children:    React.ReactNode
 }
 
-function CollapsibleSection({ label, defaultOpen = true, flex = false, children }: SectionProps) {
+function CollapsibleSection({ label, shortcut, shortcutHint, defaultOpen = true, flex = false, children }: SectionProps) {
   const [open, setOpen] = useState(defaultOpen)
 
   return (
@@ -32,6 +36,14 @@ function CollapsibleSection({ label, defaultOpen = true, flex = false, children 
         <span style={{ fontSize: '11px', fontWeight: 700, letterSpacing: '.16em', textTransform: 'uppercase', color: '#6b6258' }}>
           {label}
         </span>
+        <span style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: '10px' }}>
+        {shortcut && (
+          /* Not a button — this sits inside the header button, and nesting one
+             would be invalid. It is a hint; the key itself does the work. */
+          <span title={shortcutHint}>
+            <Keycap>{shortcut}</Keycap>
+          </span>
+        )}
         <span style={{
           fontSize: '12px', color: '#4a4540', lineHeight: 1,
           display: 'inline-block',
@@ -39,6 +51,7 @@ function CollapsibleSection({ label, defaultOpen = true, flex = false, children 
           transform: open ? 'rotate(0deg)' : 'rotate(-90deg)',
         }}>
           ▾
+        </span>
         </span>
       </button>
 
@@ -80,15 +93,15 @@ export function TheoryPanel() {
         </div>
       </div>
 
-      <CollapsibleSection label="Circle of fifths">
+      <CollapsibleSection label="Circle of fifths" shortcut="T" shortcutHint="Press T to change key">
         <CircleOfFifths />
       </CollapsibleSection>
 
-      <CollapsibleSection label="Chord quality" defaultOpen={false}>
+      <CollapsibleSection label="Chord quality" shortcut="Q" shortcutHint="Press Q to pick a chord quality" defaultOpen={false}>
         <ChordQualitySelector />
       </CollapsibleSection>
 
-      <CollapsibleSection label="Scale" flex>
+      <CollapsibleSection label="Scale" shortcut="S" shortcutHint="Press S to find a scale or mode" flex>
         <ScaleSelector />
       </CollapsibleSection>
 
