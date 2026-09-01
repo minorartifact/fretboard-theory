@@ -1,4 +1,5 @@
 import type { Chord, Tuning } from './types'
+import { cellKey } from './fretboard'
 
 export interface ChordVoicing {
   cells: Set<string>   // "stringIdx-fret" keys
@@ -65,7 +66,7 @@ function positionToCells(pos: Position): Set<string> {
   pos.frets.forEach((fretValue, si) => {
     if (fretValue === -1) return
     const actualFret = fretValue === 0 ? 0 : (pos.baseFret - 1) + fretValue
-    cells.add(`${si}-${actualFret}`)
+    cells.add(cellKey(si, actualFret))
   })
   return cells
 }

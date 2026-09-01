@@ -5,6 +5,9 @@ import { useFretboardStore } from '../../store/fretboard'
 import { supportsVoicings } from '../../theory/chordVoicings'
 import { useProgressionStore } from '../../store/progression'
 import { ALL_INTERVALS } from '../../theory/intervals'
+import { stringSets, INVERSIONS, type Inversion } from '../../theory/triads'
+import { getPitchName as pitchName } from '../../theory/pitch'
+import type { PitchClass } from '../../theory/types'
 import { SEMITONE_TO_INTERVAL } from '../../theory/constants'
 import { getPitchName } from '../../theory/pitch'
 import type { LabelMode } from '../../theory/types'
@@ -66,6 +69,12 @@ const LABEL_MODES: { id: LabelMode; label: string }[] = [
   { id: 'interval', label: 'Interval' },
 ]
 
+const INVERSION_WORD: Record<Inversion, string> = {
+  root:   'Root',
+  first:  '1st',
+  second: '2nd',
+}
+
 interface Props {
   onHearScale: () => void
 }
@@ -77,6 +86,12 @@ export function FretboardToolbar({ onHearScale }: Props) {
   const setMode           = useInteractiveStore(s => s.setMode)
   const selectedIntervals = useInteractiveStore(s => s.selectedIntervals)
   const anchor            = useInteractiveStore(s => s.anchor)
+  const chordShape        = useInteractiveStore(s => s.chordShape)
+  const setChordShape     = useInteractiveStore(s => s.setChordShape)
+  const triadSet          = useInteractiveStore(s => s.triadSet)
+  const setTriadSet       = useInteractiveStore(s => s.setTriadSet)
+  const triadInversion    = useInteractiveStore(s => s.triadInversion)
+  const setTriadInversion = useInteractiveStore(s => s.setTriadInversion)
   const toggleInterval    = useInteractiveStore(s => s.toggleInterval)
   const clearIntervals    = useInteractiveStore(s => s.clearIntervals)
 
@@ -92,7 +107,7 @@ export function FretboardToolbar({ onHearScale }: Props) {
   // Ask the domain rather than re-deriving which tunings have shapes; the two
   // copies of this rule are exactly how the toolbar came to promise voicings
   // the database could never supply.
-  const voicingsUnavailable = mode === 'chords' && !supportsVoicings(tuning)
+  const voicingsUnavailable = mode === 'chords' && chordShape === 'voicings' && !supportsVoicings(tuning)
 
   // With no chord picked, Chords mode falls back to the root major triad
   // (useFretboardAnnotations) and draws shapes for it. Nothing in the chrome
@@ -106,10 +121,18 @@ export function FretboardToolbar({ onHearScale }: Props) {
     chordQualityId === null &&
     !(progStep !== null && progSteps > 0)
 
+  const triadSets  = stringSets(tuning)
+  const setLabel   = (i: number) => triadSets[i].strings
+    .map(st => pitchName((tuning.openNotes[st] % 12) as PitchClass, 'auto', root))
+    .reverse()
+    .join('-')
+
   const anchorPc   = anchor?.pc ?? root
   const anchorName = getPitchName(anchorPc, 'auto', root)
   const activeMode = MODES.find(m => m.id === mode)
-  const hint       = activeMode?.hint ?? ''
+  const hint       = mode === 'chords' && chordShape === 'triads'
+    ? 'Each colour is one inversion · the same chord in three places on one string set'
+    : activeMode?.hint ?? ''
   const modeLabel  = activeMode?.label ?? ''
 
   return (
@@ -216,6 +239,61 @@ export function FretboardToolbar({ onHearScale }: Props) {
           <span>— {hint}</span>
         )}
       </div>
+
+      {mode === 'chords' && (
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
+          <span style={GROUP_LABEL}>Shape</span>
+          <div style={SEGMENTED}>
+            {(['voicings', 'triads'] as const).map(sh => (
+              <button
+                key={sh}
+                onClick={() => setChordShape(sh)}
+                style={chordShape === sh ? { ...SEG_BTN, background: 'rgba(56,196,214,.16)', color: '#6cd8e8' } : SEG_BTN}
+              >
+                {sh === 'voicings' ? 'Voicings' : 'Triads'}
+              </button>
+            ))}
+          </div>
+
+          {chordShape === 'triads' && (
+            <>
+              <span style={GROUP_LABEL}>Strings</span>
+              <div style={SEGMENTED}>
+                {triadSets.map((_, i) => (
+                  <button
+                    key={i}
+                    onClick={() => setTriadSet(i)}
+                    style={triadSet === i ? { ...SEG_MONO, background: '#2c241c', color: '#f1ebe2' } : SEG_MONO}
+                  >
+                    {setLabel(i)}
+                  </button>
+                ))}
+              </div>
+
+              <span style={GROUP_LABEL}>Inversion</span>
+              <div style={SEGMENTED}>
+                <button
+                  onClick={() => setTriadInversion(null)}
+                  style={triadInversion === null ? { ...SEG_BTN, background: '#2c241c', color: '#f1ebe2' } : SEG_BTN}
+                >
+                  All
+                </button>
+                {INVERSIONS.map(inv => (
+                  <button
+                    key={inv}
+                    onClick={() => setTriadInversion(inv)}
+                    style={triadInversion === inv
+                      ? { ...SEG_BTN, background: 'rgba(224,168,90,.16)', color: '#f0cf95' }
+                      : SEG_BTN}
+                  >
+                    {INVERSION_WORD[inv]}
+                  </button>
+                ))}
+              </div>
+            </>
+          )}
+        </div>
+      )}
 
       {mode === 'intervals' && (
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>

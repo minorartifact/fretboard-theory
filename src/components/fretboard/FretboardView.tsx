@@ -6,7 +6,8 @@ import { useProgressionStore, useDisplayedStep } from '../../store/progression'
 import { useInteractiveStore, POSITIONS } from '../../store/interactive'
 import { FretboardCell } from './FretboardCell'
 import { FretboardInlays } from './FretboardInlays'
-import { POSITION_WINDOW } from './colors'
+import { POSITION_WINDOW, TRIAD_COLORS } from './colors'
+import { cellKey } from '../../theory/fretboard'
 import { FretboardToolbar } from './FretboardToolbar'
 import { FretboardReadout } from './FretboardReadout'
 import { L, svgWidth, svgHeight, stringY, cellX, fretWireX, neckTop, neckBottom } from './layout'
@@ -19,7 +20,7 @@ interface Ripple { id: number; x: number; y: number }
 const MIN_NECK_WIDTH = 640
 
 export function FretboardView() {
-  const { annotations, voicings } = useFretboardAnnotations()
+  const { annotations, voicings, triads } = useFretboardAnnotations()
   const fretCount      = useFretboardStore(s => s.fretCount)
   const tuning         = useFretboardStore(s => s.tuning)
   const chordQualityId = useTheoryStore(s => s.chordQualityId)
@@ -174,7 +175,18 @@ export function FretboardView() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [stringCount, fretCount, tuning, focusCell])
 
-  // Build cell → voicing-color lookup; first voicing to claim a cell wins.
+  // Which strings the chosen triad set uses, or null when triads are not showing.
+  // Derived from the shapes themselves rather than re-reading the set index, so
+  // it cannot disagree with what is actually drawn.
+  const triadStrings = useMemo(() => {
+    if (triads.length === 0) return null
+    const set = new Set<number>()
+    for (const t of triads) for (const n of t.notes) set.add(n.string)
+    return set
+  }, [triads])
+
+  // Build cell → shape-color lookup; the first shape to claim a cell wins.
+  // Triads and voicings never coexist, so they share one map and one ring.
   const voicingCellColor = useMemo(() => {
     const map = new Map<string, string>()
     for (const v of voicings) {
@@ -182,8 +194,14 @@ export function FretboardView() {
         if (!map.has(key)) map.set(key, v.color)
       }
     }
+    for (const t of triads) {
+      for (const n of t.notes) {
+        const key = cellKey(n.string, n.fret)
+        if (!map.has(key)) map.set(key, TRIAD_COLORS[t.inversion])
+      }
+    }
     return map
-  }, [voicings])
+  }, [voicings, triads])
 
   const W    = svgWidth(fretCount)
   const H    = svgHeight()
@@ -289,7 +307,7 @@ export function FretboardView() {
               const midi = ann.fretboardNote.midiNote
               const x    = cellX(fret)
               const y    = stringY(si)
-              const key  = `${si}-${fret}`
+              const key  = cellKey(si, fret)
               const lit     = litPcs?.has(pc) ?? false
               const isTonic = pc === root
               return (
@@ -305,6 +323,7 @@ export function FretboardView() {
                   isFlash={flashId === key}
                   voicingColor={voicingCellColor.get(key) ?? null}
                   voicingMode={voicingMode}
+                  offStringSet={triadStrings !== null && !triadStrings.has(si)}
                   intervalsLive={intervalsLive}
                   intervalLit={lit}
                   isTonic={isTonic}

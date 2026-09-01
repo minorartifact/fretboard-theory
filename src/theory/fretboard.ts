@@ -17,6 +17,17 @@ export const TUNINGS_BY_ID: Record<string, Tuning> =
  * Strings are ordered low-to-high (index 0 = lowest string).
  * Frets range from 0 (open) to `fretCount` inclusive.
  */
+/**
+ * Identity of one position on the neck, used to look a cell up by key.
+ *
+ * Defined once because it had been spelled out at three call sites, and the
+ * fourth got it wrong: triad shapes keyed on `string:fret` while everything
+ * else used `string-fret`, so every lookup silently missed and no shape drew.
+ */
+export function cellKey(string: number, fret: number): string {
+  return `${string}-${fret}`
+}
+
 export function buildFretboardGrid(tuning: Tuning, fretCount: number): FretboardNote[][] {
   if (!Number.isInteger(fretCount) || fretCount < 0) {
     throw new RangeError('fretCount must be a non-negative integer')

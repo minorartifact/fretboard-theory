@@ -1,5 +1,6 @@
 import { create } from 'zustand'
 import type { PitchClass } from '../theory/types'
+import type { Inversion } from '../theory/triads'
 
 export interface PinnedNote {
   string: number
@@ -24,6 +25,15 @@ export const POSITIONS = [
  */
 export type FretboardMode = 'explore' | 'identify' | 'chords' | 'intervals'
 
+/**
+ * How Chords mode draws the chord. Voicings are database fingerings and exist
+ * only in standard tuning; triads are computed, so they work everywhere.
+ */
+export type ChordShape = 'voicings' | 'triads'
+
+/** `null` shows all three inversions at once, as the printed card does. */
+export type TriadFilter = Inversion | null
+
 interface InteractiveState {
   hoverPc:           PitchClass | null
   posIdx:            number | null
@@ -31,6 +41,10 @@ interface InteractiveState {
   pinned:            PinnedNote[]
   selectedIntervals: number[]          // semitone offsets 0–11
   anchor:            PinnedNote | null // null ⇒ follow the current root
+  chordShape:        ChordShape
+  /** Index into `stringSets(tuning)`. Clamped on read, never on write. */
+  triadSet:          number
+  triadInversion:    TriadFilter
 }
 
 interface InteractiveActions {
@@ -43,6 +57,9 @@ interface InteractiveActions {
   clearIntervals: ()                        => void
   setAnchor:      (note: PinnedNote | null) => void
   clearSelection: ()                        => void
+  setChordShape:     (shape: ChordShape)    => void
+  setTriadSet:       (idx: number)          => void
+  setTriadInversion: (inv: TriadFilter)     => void
 }
 
 export const useInteractiveStore = create<InteractiveState & InteractiveActions>(set => ({
@@ -52,6 +69,13 @@ export const useInteractiveStore = create<InteractiveState & InteractiveActions>
   pinned:            [],
   selectedIntervals: [],
   anchor:            null,
+  chordShape:        'voicings',
+  triadSet:          3,          // the top three strings, where the card starts
+  triadInversion:    null,
+
+  setChordShape:     chordShape => set({ chordShape }),
+  setTriadSet:       triadSet   => set({ triadSet }),
+  setTriadInversion: inv        => set({ triadInversion: inv }),
 
   setHoverPc: pc   => set({ hoverPc: pc }),
   setPosIdx:  idx  => set({ posIdx: idx }),

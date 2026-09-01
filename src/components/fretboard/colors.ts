@@ -93,3 +93,17 @@ export const POSITION_WINDOW = {
   stroke:      'rgba(224,168,90,.5)',
   strokeWidth: 2,
 } as const
+
+/**
+ * Triad shapes, one colour per inversion.
+ *
+ * Chords mode already teaches "each colour is one shape" through voicings, so
+ * triads reuse the same ring rather than inventing a second visual language.
+ * The distinction that matters here is which chord tone is in the bass, so the
+ * colour tracks the inversion rather than an arbitrary index.
+ */
+export const TRIAD_COLORS: Record<'root' | 'first' | 'second', string> = {
+  root:   '#54a64f',
+  first:  '#e07c30',
+  second: '#7a57d6',
+}

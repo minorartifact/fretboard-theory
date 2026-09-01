@@ -17,6 +17,10 @@ const OUT_OF_WINDOW = 0.14
 const UNLIT         = 0.1
 const CHORD_DIM     = 0.2    // at the floor on purpose: still a target
 const VOICING_DIM   = 0.07
+const OFF_SET       = 0      // strings a triad shape does not use, the card's X:
+                             // hidden outright, and below HIT_FLOOR so they are
+                             // not playable either. Only ever set while a string
+                             // set is chosen, so the neck is never inert at rest.
 
 interface Props {
   annotation:    NoteAnnotation
@@ -30,6 +34,8 @@ interface Props {
   isFlash:       boolean
   voicingColor:  string | null
   voicingMode:   boolean
+  /** This string is outside the chosen triad string set. */
+  offStringSet:  boolean
   intervalsLive: boolean          // interval mode on AND at least one interval picked
   intervalLit:   boolean          // this note sits at one of the picked intervals
   intervalLabel: string | null    // interval name measured from the anchor
@@ -46,7 +52,7 @@ interface Props {
 
 export function FretboardCell({
   annotation, x, y, chordActive,
-  hoverPc, inWindow, identify, isPinned, isFlash, voicingColor, voicingMode,
+  hoverPc, inWindow, identify, isPinned, isFlash, voicingColor, voicingMode, offStringSet,
   intervalsLive, intervalLit, intervalLabel, isTonic, isAnchor,
   cellId, ariaLabel, isFocused, showFocusRing,
   onPointerDown, onMouseEnter, onMouseLeave,
@@ -67,6 +73,9 @@ export function FretboardCell({
   const dimmedByChord = chordActive && !isChordTone(annotation.role)
 
   const dotOpacity = (() => {
+    // First, because a triad on three strings is only readable when the other
+    // three are out of the way — the printed card marks them X and draws nothing.
+    if (offStringSet)         return OFF_SET
     if (isPinned || isAnchor) return 1
     if (!inWindow)            return OUT_OF_WINDOW
     if (!showFullDot)         return DIM_FLOOR
@@ -85,7 +94,11 @@ export function FretboardCell({
         const degLabel    = scale && scaleIdx >= 0 ? scale.degrees[scaleIdx] : (SEMITONE_TO_DEGREE[scaleOffset] ?? '1')
         const fill     = degreeFill(degLabel)
         const txtColor = degreeTextColor(degLabel)
-        const showRing = annotation.semitones === 0
+        // One ring per dot. The tonic halo and a shape ring are concentric
+        // circles a few pixels apart, which reads as a smudge rather than as two
+        // pieces of information — and inside a shape the root is already named
+        // by its colour and its label.
+        const showRing = annotation.semitones === 0 && voicingColor === null
 
         return (
           <g opacity={dotOpacity}>

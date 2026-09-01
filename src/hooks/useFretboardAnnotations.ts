@@ -9,12 +9,14 @@ import { annotateGrid } from '../theory/annotation'
 import { CHORD_QUALITIES_BY_ID } from '../theory/chords'
 import { resolveProgression } from '../theory/progression'
 import { getChordVoicings, loadChordDb, isChordDbLoaded } from '../theory/chordVoicings'
+import { stringSets, triadShapes, type TriadShape } from '../theory/triads'
 import type { Chord } from '../theory/types'
 import type { ChordVoicing } from '../theory/chordVoicings'
 
 export function useFretboardAnnotations(): {
   annotations:  ReturnType<typeof annotateGrid>
   voicings:     ChordVoicing[]
+  triads:       TriadShape[]
 } {
   const root           = useTheoryStore(s => s.root)
   const scale          = useTheoryStore(s => s.scale)
@@ -25,7 +27,12 @@ export function useFretboardAnnotations(): {
   const fretCount      = useFretboardStore(s => s.fretCount)
   const startFret      = useFretboardStore(s => s.startFret)
   const labelMode      = useViewStore(s => s.labelMode)
-  const voicingMode    = useInteractiveStore(s => s.mode === 'chords')
+  const chordsMode     = useInteractiveStore(s => s.mode === 'chords')
+  const chordShape     = useInteractiveStore(s => s.chordShape)
+  const triadSet       = useInteractiveStore(s => s.triadSet)
+  const triadInversion = useInteractiveStore(s => s.triadInversion)
+
+  const voicingMode    = chordsMode && chordShape === 'voicings'
 
   // The chord database is fetched the first time Chords mode is entered; this
   // flag re-runs the memo once it lands.
@@ -53,7 +60,7 @@ export function useFretboardAnnotations(): {
     // In voicing mode, default to major triad so roles (root/third/fifth) are
     // always set — enabling proper dimming even with no explicit chord active.
     const voicingChord: Chord = chord ?? { root, quality: CHORD_QUALITIES_BY_ID['maj'] }
-    const annotationChord     = voicingMode ? voicingChord : chord
+    const annotationChord     = chordsMode ? voicingChord : chord
 
     const grid = buildFretboardGrid(tuning, fretCount)
     const annotations = annotateGrid(grid, {
@@ -69,6 +76,20 @@ export function useFretboardAnnotations(): {
       ? getChordVoicings(voicingChord, tuning)
       : []
 
-    return { annotations, voicings }
-  }, [root, scale, chordQualityId, progSteps, step, tuning, fretCount, startFret, labelMode, voicingMode, dbReady])
+    // Triads are computed, so unlike voicings they need no database and hold in
+    // every tuning. The set index is clamped here rather than on write: the
+    // tuning can change under a stored index at any time.
+    let triads: TriadShape[] = []
+    if (chordsMode && chordShape === 'triads') {
+      const sets = stringSets(tuning)
+      const set  = sets[Math.min(Math.max(triadSet, 0), sets.length - 1)]
+      if (set) {
+        triads = triadShapes(voicingChord, tuning, set, { fretCount })
+          .filter(t => triadInversion === null || t.inversion === triadInversion)
+      }
+    }
+
+    return { annotations, voicings, triads }
+  }, [root, scale, chordQualityId, progSteps, step, tuning, fretCount, startFret, labelMode,
+      voicingMode, dbReady, chordsMode, chordShape, triadSet, triadInversion])
 }
