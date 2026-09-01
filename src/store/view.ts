@@ -42,6 +42,15 @@ interface ViewActions {
   toggleKeys:        ()               => void
 }
 
+/**
+ * Opening any one overlay closes the others. Each owns the keyboard while it is
+ * up, so two at once means two things reading the same keystrokes — and the
+ * exclusion had drifted: the shortcut list stood down for nothing, so `?` then
+ * `t` stacked the quick-pick on top of it. Spreading one constant is what stops
+ * a new overlay from having to remember every existing one.
+ */
+const ONLY = { tourOpen: false, palette: null, keysOpen: false, shortcutsOpen: false } as const
+
 export const useViewStore = create<ViewState & ViewActions>(set => ({
   labelMode:       'note',
   fullscreen:      false,
@@ -58,21 +67,19 @@ export const useViewStore = create<ViewState & ViewActions>(set => ({
   toggleProgression: () => set(s => ({ showProgression: !s.showProgression })),
   openSidebar:       () => set({ sidebarOpen: true }),
   closeSidebar:      () => set({ sidebarOpen: false }),
-  toggleShortcuts:   () => set(s => ({ shortcutsOpen: !s.shortcutsOpen })),
+  toggleShortcuts:   () => set(s => s.shortcutsOpen ? { shortcutsOpen: false } : { ...ONLY, shortcutsOpen: true }),
   closeShortcuts:    () => set({ shortcutsOpen: false }),
   // The tour walks the real chrome, so it cannot run while fullscreen has
   // hidden most of what it points at.
-  openTour:          () => set({ tourOpen: true, shortcutsOpen: false, fullscreen: false, keysOpen: false }),
+  openTour:          () => set({ ...ONLY, tourOpen: true, fullscreen: false }),
   closeTour:         () => set({ tourOpen: false }),
   // The quick-pick, the tour and the keys wheel each own the keyboard while
   // open, so no two of them may overlap.
-  openPalette:       kind => set({ palette: kind, tourOpen: false, keysOpen: false }),
+  openPalette:       kind => set({ ...ONLY, palette: kind }),
   closePalette:      () => set({ palette: null }),
   // Unlike the tour, this one is worth having in fullscreen — that is the
   // layout with no sidebar circle to reach for — so it leaves `fullscreen` be.
-  openKeys:          () => set({ keysOpen: true, tourOpen: false, palette: null, shortcutsOpen: false }),
+  openKeys:          () => set({ ...ONLY, keysOpen: true }),
   closeKeys:         () => set({ keysOpen: false }),
-  toggleKeys:        () => set(s => s.keysOpen
-    ? { keysOpen: false }
-    : { keysOpen: true, tourOpen: false, palette: null, shortcutsOpen: false }),
+  toggleKeys:        () => set(s => s.keysOpen ? { keysOpen: false } : { ...ONLY, keysOpen: true }),
 }))

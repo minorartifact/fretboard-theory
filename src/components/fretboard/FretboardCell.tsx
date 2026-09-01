@@ -149,31 +149,38 @@ export function FretboardCell({
       {isPinned && (
         <circle cx={x} cy={y} r={L.dotRadius + 5} fill="none" stroke="#f0d28a" strokeWidth={2.5} />
       )}
-      {isAnchor && (
-        <>
-          <circle cx={x} cy={y} r={L.dotRadius + 5} fill="none" stroke={ANCHOR_STROKE} strokeWidth={2.5} />
-          <circle cx={x} cy={y} r={L.dotRadius + 8.5} fill="none" stroke={ANCHOR_STROKE} strokeWidth={1} opacity={0.5} />
-        </>
-      )}
-      {isGlow && (
-        <circle
-          cx={x} cy={y} r={L.dotRadius + 6}
-          fill="none" stroke="rgba(255,255,255,.85)" strokeWidth={2}
-          style={{ animation: 'fbglow 1.1s ease-in-out infinite' }}
-        />
-      )}
-      {isFlash && (
-        <circle cx={x} cy={y} r={L.dotRadius + 7} fill="none" stroke="#e0a85a" strokeWidth={3} />
-      )}
-      {voicingColor && (
-        <circle
-          cx={x} cy={y} r={L.dotRadius + 5}
-          fill="none"
-          stroke={voicingColor}
-          strokeWidth={2.5}
-          opacity={0.9}
-        />
-      )}
+      {/* Rings answer to the same dimming rule as the dot they wrap. Drawn
+          outside it, a shape ring stayed at full strength over a dot faded to
+          0.14 by the position window — bright empty circles floating on an
+          otherwise dark neck. The focus ring below is deliberately not in here:
+          it marks where the keyboard is, not what the neck is showing. */}
+      <g opacity={dotOpacity}>
+        {isAnchor && (
+          <>
+            <circle cx={x} cy={y} r={L.dotRadius + 5} fill="none" stroke={ANCHOR_STROKE} strokeWidth={2.5} />
+            <circle cx={x} cy={y} r={L.dotRadius + 8.5} fill="none" stroke={ANCHOR_STROKE} strokeWidth={1} opacity={0.5} />
+          </>
+        )}
+        {isGlow && (
+          <circle
+            cx={x} cy={y} r={L.dotRadius + 6}
+            fill="none" stroke="rgba(255,255,255,.85)" strokeWidth={2}
+            style={{ animation: 'fbglow 1.1s ease-in-out infinite' }}
+          />
+        )}
+        {isFlash && (
+          <circle cx={x} cy={y} r={L.dotRadius + 7} fill="none" stroke="#e0a85a" strokeWidth={3} />
+        )}
+        {voicingColor && (
+          <circle
+            cx={x} cy={y} r={L.dotRadius + 5}
+            fill="none"
+            stroke={voicingColor}
+            strokeWidth={2.5}
+            opacity={0.9}
+          />
+        )}
+      </g>
 
       {/* Transparent hit target — always on top, pointer-sized, and the
           focusable element for keyboard traversal of the neck. */}

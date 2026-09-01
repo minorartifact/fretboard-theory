@@ -2,7 +2,7 @@ import { create } from 'zustand'
 import type { PitchClass, ScaleDef } from '../theory/types'
 import type { ProgressionStep } from '../theory/progression'
 import { SCALES_BY_ID } from '../theory/scales'
-import { serializeSteps, deserializeSteps, type StoredStep } from './progression'
+import { serializeSteps, deserializeSteps, clampBpm, type StoredStep } from './progression'
 import { useTheoryStore } from './theory'
 import { useProgressionStore } from './progression'
 
@@ -42,10 +42,12 @@ function loadSongs(): SavedSong[] {
       .map(s => ({
         id:      s.id,
         name:    s.name,
-        root:    (s.root ?? 0) as PitchClass,
+        // Range, not just type. Stored data can be hand-edited or written by
+        // an older version, and a root of 99 reaches every corner of the app.
+        root:    (((Math.trunc(Number(s.root)) % 12) + 12) % 12 || 0) as PitchClass,
         scaleId: s.scaleId ?? 'major',
         steps:   deserializeSteps(s.steps),
-        bpm:     typeof s.bpm === 'number' ? s.bpm : 100,
+        bpm:     typeof s.bpm === 'number' && Number.isFinite(s.bpm) ? clampBpm(s.bpm) : 100,
         loop:    typeof s.loop === 'boolean' ? s.loop : true,
         savedAt: typeof s.savedAt === 'number' ? s.savedAt : 0,
       }))

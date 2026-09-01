@@ -9,5 +9,8 @@ export default defineConfig({
     // jsdom so stores, hooks and components are testable — several of them
     // touch localStorage or the DOM.
     environment: 'jsdom',
+    // jsdom here provides no localStorage, so the stores' try/catch swallowed
+    // every persistence path. See src/test/setup.ts.
+    setupFiles: ['src/test/setup.ts'],
   },
 })

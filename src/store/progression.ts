@@ -21,6 +21,9 @@ import { useTheoryStore } from './theory'
 // One quarter-note tick at the given BPM
 const quarterMs = (bpm: number) => Math.round(60_000 / bpm)
 
+/** The transport's tempo range. Shared so every loader clamps identically. */
+export const clampBpm = (bpm: number) => Math.max(40, Math.min(220, bpm))
+
 // ── Serialised shape for localStorage ──────────────────────────────────────
 
 export type StoredStep = {
@@ -65,7 +68,7 @@ function load(): Partial<{ steps: ProgressionStep[]; bpm: number; loop: boolean;
     const d = JSON.parse(raw)
     return {
       steps:      deserializeSteps(d.steps),
-      bpm:        typeof d.bpm  === 'number'  ? Math.max(40, Math.min(220, d.bpm)) : 100,
+      bpm:        typeof d.bpm  === 'number'  ? clampBpm(d.bpm) : 100,
       loop:       typeof d.loop === 'boolean' ? d.loop : true,
       metronome:  typeof d.metronome === 'boolean' ? d.metronome : false,
     }
@@ -266,7 +269,7 @@ export const useProgressionStore = create<ProgressionState & ProgressionActions>
       restart: () => set(s => s.steps.length ? { activeStep: 0, beatIndex: 0 } : {}),
 
       setBpm: bpm => {
-        const v = Math.max(40, Math.min(220, bpm))
+        const v = clampBpm(bpm)
         set({ bpm: v, beatIndex: 0 })
         if (get().playing) startTimer()
       },

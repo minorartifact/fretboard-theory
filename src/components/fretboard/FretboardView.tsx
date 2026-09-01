@@ -62,12 +62,6 @@ export function FretboardView() {
   const [focusCell, setFocusCell] = useState<{ s: number; f: number }>({ s: 0, f: 0 })
   const [neckFocused, setNeckFocused] = useState(false)
 
-  useEffect(() => {
-    if (!neckFocused) return
-    const el = document.getElementById(`fbcell-${focusCell.s}-${focusCell.f}`)
-    ;(el as unknown as HTMLElement | null)?.focus()
-  }, [focusCell, neckFocused])
-
   const [flashId, setFlashId] = useState<string | null>(null)
   const [ripples, setRipples] = useState<Ripple[]>([])
   const rippleIdRef  = useRef(0)
@@ -145,36 +139,6 @@ export function FretboardView() {
 
   const stringCount = tuning.openNotes.length
 
-  const handleKeyDown = useCallback((e: React.KeyboardEvent<SVGSVGElement>) => {
-    const step = (ds: number, df: number) => {
-      e.preventDefault()
-      setFocusCell(c => ({
-        s: Math.min(stringCount - 1, Math.max(0, c.s + ds)),
-        f: Math.min(fretCount, Math.max(0, c.f + df)),
-      }))
-    }
-    switch (e.key) {
-      case 'ArrowRight': return step(0, 1)
-      case 'ArrowLeft':  return step(0, -1)
-      // String 0 is the low E at the bottom, so Up moves toward higher strings.
-      case 'ArrowUp':    return step(1, 0)
-      case 'ArrowDown':  return step(-1, 0)
-      case 'Home':       e.preventDefault(); return setFocusCell(c => ({ ...c, f: 0 }))
-      case 'End':        e.preventDefault(); return setFocusCell(c => ({ ...c, f: fretCount }))
-      case 'Enter':
-      case ' ': {
-        e.preventDefault()
-        const midi = tuning.openNotes[focusCell.s] + focusCell.f
-        handlePointerDown(
-          focusCell.s, focusCell.f, (midi % 12) as PitchClass, midi,
-          cellX(focusCell.f), stringY(focusCell.s),
-        )
-        return
-      }
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [stringCount, fretCount, tuning, focusCell])
-
   // Which strings the chosen triad set uses, or null when triads are not showing.
   // Derived from the shapes themselves rather than re-reading the set index, so
   // it cannot disagree with what is actually drawn.
@@ -184,6 +148,62 @@ export function FretboardView() {
     for (const t of triads) for (const n of t.notes) set.add(n.string)
     return set
   }, [triads])
+
+  // The strings the keyboard may visit. Hiding a string has to remove it from
+  // keyboard reach too, or Tab lands on a note that is not drawn and Enter
+  // plays it — the pointer path already refuses, via HIT_FLOOR.
+  const navStrings = useMemo(() => {
+    const all = Array.from({ length: stringCount }, (_, i) => i)
+    return triadStrings ? all.filter(i => triadStrings.has(i)) : all
+  }, [stringCount, triadStrings])
+
+  // Focus snaps onto a reachable string rather than being stored there, so a
+  // set chosen while the neck is focused cannot strand it on a hidden string.
+  const focus = useMemo(() => {
+    if (navStrings.includes(focusCell.s)) return focusCell
+    const nearest = [...navStrings].sort((a, b) => Math.abs(a - focusCell.s) - Math.abs(b - focusCell.s))[0]
+    return nearest === undefined ? focusCell : { s: nearest, f: focusCell.f }
+  }, [focusCell, navStrings])
+
+  useEffect(() => {
+    if (!neckFocused) return
+    const el = document.getElementById(`fbcell-${focus.s}-${focus.f}`)
+    ;(el as unknown as HTMLElement | null)?.focus()
+  }, [focus, neckFocused])
+
+  const handleKeyDown = useCallback((e: React.KeyboardEvent<SVGSVGElement>) => {
+    const step = (ds: number, df: number) => {
+      e.preventDefault()
+      // Vertical movement walks the reachable strings, so a hidden set is
+      // stepped over rather than landed on.
+      const at   = navStrings.indexOf(focus.s)
+      const next = navStrings[Math.min(navStrings.length - 1, Math.max(0, at + ds))] ?? focus.s
+      setFocusCell({
+        s: ds ? next : focus.s,
+        f: Math.min(fretCount, Math.max(0, focus.f + df)),
+      })
+    }
+    switch (e.key) {
+      case 'ArrowRight': return step(0, 1)
+      case 'ArrowLeft':  return step(0, -1)
+      // String 0 is the low E at the bottom, so Up moves toward higher strings.
+      case 'ArrowUp':    return step(1, 0)
+      case 'ArrowDown':  return step(-1, 0)
+      case 'Home':       e.preventDefault(); return setFocusCell({ s: focus.s, f: 0 })
+      case 'End':        e.preventDefault(); return setFocusCell({ s: focus.s, f: fretCount })
+      case 'Enter':
+      case ' ': {
+        e.preventDefault()
+        const midi = tuning.openNotes[focus.s] + focus.f
+        handlePointerDown(
+          focus.s, focus.f, (midi % 12) as PitchClass, midi,
+          cellX(focus.f), stringY(focus.s),
+        )
+        return
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [fretCount, tuning, focus, navStrings])
 
   // Build cell → shape-color lookup; the first shape to claim a cell wins.
   // Triads and voicings never coexist, so they share one map and one ring.
@@ -328,8 +348,8 @@ export function FretboardView() {
                   intervalLit={lit}
                   isTonic={isTonic}
                   cellId={`fbcell-${si}-${fret}`}
-                  isFocused={focusCell.s === si && focusCell.f === fret}
-                  showFocusRing={neckFocused && focusCell.s === si && focusCell.f === fret}
+                  isFocused={focus.s === si && focus.f === fret}
+                  showFocusRing={neckFocused && focus.s === si && focus.f === fret}
                   ariaLabel={`${ann.pitchName}, string ${si + 1}, fret ${fret}${ann.highlighted ? `, degree ${ann.degreeLabel}` : ''}`}
                   intervalLabel={(lit || isTonic) && intervalMode ? intervalLabelFrom(anchorPc, pc) : null}
                   isAnchor={intervalMode && anchor?.string === si && anchor?.fret === fret}
