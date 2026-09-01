@@ -14,6 +14,11 @@ export const L = {
   // Padding from outermost string to neck edge (top and bottom)
   neckPad: 20,
 
+  // How far the position window reaches past the fret wires bounding it, so its
+  // outline reads as its own edge rather than a thickened fret. It overshoots
+  // on all four sides, which is also what the vertical padding is doing.
+  positionOvershoot: 6.5,
+
   // String stroke widths, index 0 = low E, index 5 = high E
   stringWidths: [3.0, 2.4, 1.9, 1.5, 1.1, 0.8] as const,
 

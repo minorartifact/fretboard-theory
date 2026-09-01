@@ -6,6 +6,7 @@ import { useProgressionStore, useDisplayedStep } from '../../store/progression'
 import { useInteractiveStore, POSITIONS } from '../../store/interactive'
 import { FretboardCell } from './FretboardCell'
 import { FretboardInlays } from './FretboardInlays'
+import { POSITION_WINDOW } from './colors'
 import { FretboardToolbar } from './FretboardToolbar'
 import { FretboardReadout } from './FretboardReadout'
 import { L, svgWidth, svgHeight, stringY, cellX, fretWireX, neckTop, neckBottom } from './layout'
@@ -262,15 +263,19 @@ export function FretboardView() {
           {/* Position window highlight overlay */}
           {posIdx !== null && (() => {
             const p  = POSITIONS[posIdx]
-            const lx = p.lo <= 0 ? 2 : fretWireX(p.lo - 1)
-            const rx = fretWireX(p.hi)
+            // Reaches past the wires it spans: drawn flush, the outline lands on
+            // top of a fret and reads as a thicker fret rather than a boundary.
+            // Clamped at the low end so the open-string column cannot push it
+            // off the left edge of the canvas.
+            const lx = Math.max(1, (p.lo <= 0 ? 2 : fretWireX(p.lo - 1)) - L.positionOvershoot)
+            const rx = fretWireX(p.hi) + L.positionOvershoot
             return (
               <rect
-                x={lx} y={topY - 3}
-                width={rx - lx} height={botY - topY + 6}
-                fill="rgba(224,168,90,.07)"
-                stroke="rgba(224,168,90,.34)"
-                strokeWidth={1.5}
+                x={lx} y={topY - L.positionOvershoot}
+                width={rx - lx} height={botY - topY + L.positionOvershoot * 2}
+                fill={POSITION_WINDOW.fill}
+                stroke={POSITION_WINDOW.stroke}
+                strokeWidth={POSITION_WINDOW.strokeWidth}
                 rx={6}
               />
             )

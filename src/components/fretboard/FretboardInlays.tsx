@@ -1,7 +1,9 @@
 import { cellX, fretNumY, L } from './layout'
+import { INLAY } from './colors'
 
 const INLAY_FRETS   = [3, 5, 7, 9, 12, 15]
 const DOUBLE_INLAYS = new Set([12])
+
 
 interface Props {
   fretCount:    number
@@ -12,21 +14,34 @@ interface Props {
 export function FretboardInlays({ fretCount, neckTopY, neckBottomY }: Props) {
   const midY    = (neckTopY + neckBottomY) / 2
   const numY    = fretNumY()
-  const inlayColor = '#b59a6a'
+
+  const markers = INLAY_FRETS.filter(f => f <= fretCount)
 
   return (
     <>
-      {INLAY_FRETS.filter(f => f <= fretCount).map(fret => {
+      {/* Drawn first, so the strings, inlay dots and note dots all sit on top. */}
+      {markers.map(fret => (
+        <rect
+          key={`band-${fret}`}
+          x={cellX(fret) - L.fretColWidth / 2}
+          y={neckTopY}
+          width={L.fretColWidth}
+          height={neckBottomY - neckTopY}
+          fill={fret === 12 ? INLAY.bandOctave : INLAY.band}
+        />
+      ))}
+
+      {markers.map(fret => {
         const x = cellX(fret)
         return (
           <g key={fret}>
             {DOUBLE_INLAYS.has(fret) ? (
               <>
-                <circle cx={x} cy={neckTopY + (neckBottomY - neckTopY) * 0.31} r={L.inlayRadius} fill={inlayColor} opacity={0.5} />
-                <circle cx={x} cy={neckTopY + (neckBottomY - neckTopY) * 0.69} r={L.inlayRadius} fill={inlayColor} opacity={0.5} />
+                <circle cx={x} cy={neckTopY + (neckBottomY - neckTopY) * 0.31} r={L.inlayRadius} fill={INLAY.fill} opacity={INLAY.opacity} />
+                <circle cx={x} cy={neckTopY + (neckBottomY - neckTopY) * 0.69} r={L.inlayRadius} fill={INLAY.fill} opacity={INLAY.opacity} />
               </>
             ) : (
-              <circle cx={x} cy={midY} r={L.inlayRadius} fill={inlayColor} opacity={0.5} />
+              <circle cx={x} cy={midY} r={L.inlayRadius} fill={INLAY.fill} opacity={INLAY.opacity} />
             )}
             <text
               x={x}
