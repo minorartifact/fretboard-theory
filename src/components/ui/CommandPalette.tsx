@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useViewStore, type PaletteKind } from '../../store/view'
 import { useTheoryStore } from '../../store/theory'
 import { chooseChordQuality } from '../../store/selection'
@@ -65,8 +65,9 @@ export function CommandPalette() {
       return SCALES.map(s => ({
         id: s.id,
         label: s.name,
-        meta: s.category,
-        hint: `${s.pattern.length} notes`,
+        meta: `${s.category} · ${s.pattern.length} notes`,
+        // Same column as a chord's degrees: what the thing is built from.
+        hint: s.degrees.join(' '),
         current: scale?.id === s.id,
         choose: () => setScale(s),
       }))
@@ -108,19 +109,27 @@ export function CommandPalette() {
     close()
   }, [close])
 
-  const onKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === 'Escape')         { e.preventDefault(); close() }
-    else if (e.key === 'ArrowDown') { e.preventDefault(); setSelected(Math.min(index + 1, matches.length - 1)) }
-    else if (e.key === 'ArrowUp')   { e.preventDefault(); setSelected(Math.max(index - 1, 0)) }
-    else if (e.key === 'Enter')     { e.preventDefault(); commit(matches[index]) }
-    else if (e.key === 'Tab') {
-      // Cycle categories without leaving the overlay.
-      e.preventDefault()
-      const at = KINDS.findIndex(k => k.kind === kind)
-      const next = KINDS[(at + (e.shiftKey ? KINDS.length - 1 : 1)) % KINDS.length]
-      setQuery(''); setSelected(0); openPalette(next.kind)
+  // On the window, not the card: clicking the card's own chrome blurs the input,
+  // and a handler bound to the card would then never see the key at all — Esc
+  // stopped closing the overlay. The global shortcuts stand down while it is open.
+  useEffect(() => {
+    if (!kind) return
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape')         { e.preventDefault(); close() }
+      else if (e.key === 'ArrowDown') { e.preventDefault(); setSelected(Math.min(index + 1, matches.length - 1)) }
+      else if (e.key === 'ArrowUp')   { e.preventDefault(); setSelected(Math.max(index - 1, 0)) }
+      else if (e.key === 'Enter')     { e.preventDefault(); commit(matches[index]) }
+      else if (e.key === 'Tab') {
+        // Cycle categories without leaving the overlay.
+        e.preventDefault()
+        const at = KINDS.findIndex(k => k.kind === kind)
+        const next = KINDS[(at + (e.shiftKey ? KINDS.length - 1 : 1)) % KINDS.length]
+        setQuery(''); setSelected(0); openPalette(next.kind)
+      }
     }
-  }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [kind, index, matches, close, commit, openPalette])
 
   /** Focus on mount without an effect. */
   const inputRef = useCallback((el: HTMLInputElement | null) => { el?.focus() }, [])
@@ -142,7 +151,6 @@ export function CommandPalette() {
       }}
     >
       <div
-        onKeyDown={onKeyDown}
         style={{
           width: 'min(560px, calc(100vw - 32px))', boxSizing: 'border-box',
           background: '#1c1610', border: '1px solid #3d3125', borderRadius: '16px',
