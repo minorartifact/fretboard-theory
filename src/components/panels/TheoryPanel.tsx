@@ -4,6 +4,7 @@ import { ScaleSelector } from '../theory/ScaleSelector'
 import { ChordQualitySelector } from '../theory/ChordQualitySelector'
 import { SavedSongsPanel } from '../theory/SavedSongsPanel'
 import { Keycap } from '../ui/Keycap'
+import { useViewStore } from '../../store/view'
 
 interface SectionProps {
   label:       string
@@ -67,6 +68,37 @@ function CollapsibleSection({ label, shortcut, shortcutHint, defaultOpen = true,
   )
 }
 
+/**
+ * The only thing on screen that says the keys wheel exists. Without it `K` is
+ * discoverable solely through the shortcut list, and the guided tour has
+ * nothing to point at — a tour step needs a live element to spotlight.
+ */
+function KeysWheelButton() {
+  const openKeys = useViewStore(s => s.openKeys)
+
+  return (
+    <button
+      data-tour="keys"
+      onClick={() => openKeys()}
+      title="Every key, its relative minor and its diminished (K)"
+      style={{
+        width: '100%', marginTop: '12px',
+        display: 'flex', alignItems: 'center', gap: '8px',
+        padding: '8px 11px', borderRadius: '9px',
+        border: '1px solid #2a221b', background: '#1b150f',
+        color: '#b3a89a', fontSize: '12px', fontWeight: 600,
+        cursor: 'pointer', fontFamily: 'inherit',
+        transition: 'background .12s, color .12s',
+      }}
+      onMouseEnter={e => { const b = e.currentTarget; b.style.background = '#221b14'; b.style.color = '#e8ddcf' }}
+      onMouseLeave={e => { const b = e.currentTarget; b.style.background = '#1b150f'; b.style.color = '#b3a89a' }}
+    >
+      <span>All 12 keys and their minors</span>
+      <span style={{ marginLeft: 'auto' }}><Keycap>K</Keycap></span>
+    </button>
+  )
+}
+
 export function TheoryPanel() {
   return (
     <aside style={{
@@ -95,6 +127,7 @@ export function TheoryPanel() {
 
       <CollapsibleSection label="Circle of fifths" shortcut="T" shortcutHint="Press T to change key">
         <CircleOfFifths />
+        <KeysWheelButton />
       </CollapsibleSection>
 
       <CollapsibleSection label="Chord quality" shortcut="Q" shortcutHint="Press Q to pick a chord quality" defaultOpen={false}>

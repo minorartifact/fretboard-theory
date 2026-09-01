@@ -14,6 +14,7 @@ import { KeyStrip } from './components/theory/KeyStrip'
 import { ShortcutsOverlay } from './components/ui/ShortcutsOverlay'
 import { GuidedTour, GuidedTourButton } from './components/ui/GuidedTour'
 import { CommandPalette } from './components/ui/CommandPalette'
+import { KeysOverlay } from './components/ui/KeysOverlay'
 import { useTheoryStore } from './store/theory'
 import { useProgressionStore, useDisplayedStep } from './store/progression'
 import { useViewStore } from './store/view'
@@ -142,6 +143,7 @@ function App() {
   const showProgression = useViewStore(s => s.showProgression)
   const sidebarOpen     = useViewStore(s => s.sidebarOpen)
   const tourOpen        = useViewStore(s => s.tourOpen)
+  const keysOpen        = useViewStore(s => s.keysOpen)
   const closeSidebar    = useViewStore(s => s.closeSidebar)
   const narrow          = useMediaQuery(NARROW)
   const clearFretboardSelection = useInteractiveStore(s => s.clearSelection)
@@ -205,6 +207,7 @@ function App() {
       <ShortcutsOverlay />
       {tourOpen && <GuidedTour />}
       <CommandPalette />
+      {keysOpen && <KeysOverlay />}
     </div>
   )
 }

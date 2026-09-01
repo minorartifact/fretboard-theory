@@ -8,7 +8,8 @@ const GROUPS: { title: string; rows: [string, string][] }[] = [
   {
     title: 'Quick picks',
     rows: [
-      ['T', 'Change key'],
+      ['K', 'The whole circle — key and scale at once'],
+      ['T', 'Change key, keeping the scale'],
       ['S', 'Find a scale or mode'],
       ['Q', 'Pick a chord quality'],
     ],

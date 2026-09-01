@@ -25,7 +25,7 @@ interface TourStep {
 const STEPS: TourStep[] = [
   {
     title: 'Find your way around Neckwise',
-    body: 'Eight quick stops: where your key lives, how to change how it sounds, and how to hear it on the neck. About a minute.',
+    body: 'Nine quick stops: where your key lives, how to change how it sounds, and how to hear it on the neck. About a minute.',
     next: 'Start tour',
   },
   {
@@ -38,6 +38,12 @@ const STEPS: TourStep[] = [
     title: 'Change key by relationship, not by list',
     body: 'Neighbours on the wheel share almost all their notes. One click sideways gives you a key that still sounds close; across the wheel is a bigger move.',
     tip: 'Click a lit note to move the whole board to that key.',
+  },
+  {
+    target: 'keys', pad: 10,
+    title: 'Or take the whole key at once',
+    body: 'The small wheel moves the tonic. This one hands you a key: every major, the relative minor sharing its notes, and the diminished on its seventh — one pick sets tonic and scale together, and names the sharps or flats you would be reading.',
+    tip: 'Press K anywhere to open it, arrow around the rings, and Enter to take the key.',
   },
   {
     target: 'scales', pad: 8,

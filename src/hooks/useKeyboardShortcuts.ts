@@ -23,11 +23,11 @@ export function useKeyboardShortcuts() {
       const onFretboard = (e.target as Element | null)?.closest?.('[data-fretcell]') != null
       if (onFretboard && (e.code === 'Space' || e.key.startsWith('Arrow') || e.key === 'Enter')) return
 
-      // The tour and the quick-pick each own the keyboard while open: both have
-      // their own Esc and Enter, and Space toggling playback underneath either
-      // one would be a surprise.
+      // The tour, the quick-pick and the keys wheel each own the keyboard while
+      // open: each has its own Esc and Enter, and Space toggling playback
+      // underneath any of them would be a surprise.
       const view = useViewStore.getState()
-      if (view.tourOpen || view.palette !== null) return
+      if (view.tourOpen || view.palette !== null || view.keysOpen) return
 
       // Esc unwinds one layer at a time, innermost first.
       if (e.code === 'Escape') {
@@ -45,6 +45,17 @@ export function useKeyboardShortcuts() {
       if (palette) {
         e.preventDefault()
         useViewStore.getState().openPalette(palette)
+        return
+      }
+
+      // The whole circle at once. `T` stays a tonic-only change, because the
+      // wheel knows just the three modes a key signature describes. The repeat
+      // guard matters for a toggle: holding K would otherwise flap it open and
+      // shut for as long as the key is down.
+      if (e.code === 'KeyK') {
+        if (e.repeat) return
+        e.preventDefault()
+        useViewStore.getState().toggleKeys()
         return
       }
 

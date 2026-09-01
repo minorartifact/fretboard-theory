@@ -20,6 +20,8 @@ interface ViewState {
   tourOpen:        boolean
   /** Quick-pick overlay, or null when closed. Also transient. */
   palette:         PaletteKind | null
+  /** Keys wheel overlay. Transient, and works in fullscreen. */
+  keysOpen:        boolean
 }
 
 interface ViewActions {
@@ -35,6 +37,9 @@ interface ViewActions {
   closeTour:         ()               => void
   openPalette:       (kind: PaletteKind) => void
   closePalette:      ()               => void
+  openKeys:          ()               => void
+  closeKeys:         ()               => void
+  toggleKeys:        ()               => void
 }
 
 export const useViewStore = create<ViewState & ViewActions>(set => ({
@@ -45,6 +50,7 @@ export const useViewStore = create<ViewState & ViewActions>(set => ({
   shortcutsOpen:   false,
   tourOpen:        false,
   palette:         null,
+  keysOpen:        false,
 
   setLabelMode:      labelMode => set({ labelMode }),
   setFullscreen:     fullscreen => set({ fullscreen }),
@@ -56,9 +62,17 @@ export const useViewStore = create<ViewState & ViewActions>(set => ({
   closeShortcuts:    () => set({ shortcutsOpen: false }),
   // The tour walks the real chrome, so it cannot run while fullscreen has
   // hidden most of what it points at.
-  openTour:          () => set({ tourOpen: true, shortcutsOpen: false, fullscreen: false }),
+  openTour:          () => set({ tourOpen: true, shortcutsOpen: false, fullscreen: false, keysOpen: false }),
   closeTour:         () => set({ tourOpen: false }),
-  // The quick-pick and the tour both own the keyboard, so they cannot overlap.
-  openPalette:       kind => set({ palette: kind, tourOpen: false }),
+  // The quick-pick, the tour and the keys wheel each own the keyboard while
+  // open, so no two of them may overlap.
+  openPalette:       kind => set({ palette: kind, tourOpen: false, keysOpen: false }),
   closePalette:      () => set({ palette: null }),
+  // Unlike the tour, this one is worth having in fullscreen — that is the
+  // layout with no sidebar circle to reach for — so it leaves `fullscreen` be.
+  openKeys:          () => set({ keysOpen: true, tourOpen: false, palette: null, shortcutsOpen: false }),
+  closeKeys:         () => set({ keysOpen: false }),
+  toggleKeys:        () => set(s => s.keysOpen
+    ? { keysOpen: false }
+    : { keysOpen: true, tourOpen: false, palette: null, shortcutsOpen: false }),
 }))

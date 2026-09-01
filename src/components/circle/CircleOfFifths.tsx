@@ -2,6 +2,7 @@ import { useState, useMemo } from 'react'
 import { useTheoryStore } from '../../store/theory'
 import { useProgressionStore, useDisplayedStep } from '../../store/progression'
 import { isInScale, getScaleDegreeLabel } from '../../theory/scales'
+import { CIRCLE_OF_FIFTHS } from '../../theory/keys'
 import { resolveProgression } from '../../theory/progression'
 import { SHARP_NAMES, FLAT_NAMES, ROOT_PREFERS_SHARPS } from '../../theory/constants'
 import { degreeFill, degreeTextColor } from '../fretboard/colors'
@@ -9,8 +10,9 @@ import type { PitchClass } from '../../theory/types'
 
 type CircleMode = 'fifths' | 'thirds'
 
-// Clockwise from 12 o'clock
-const FIFTHS_PCS: PitchClass[] = [0, 7, 2, 9, 4, 11, 6, 1, 8, 3, 10, 5]
+// Clockwise from 12 o'clock. The fifths order is shared with the keys wheel —
+// two copies of it would be two circles free to disagree.
+const FIFTHS_PCS: PitchClass[] = CIRCLE_OF_FIFTHS
 const THIRDS_PCS: PitchClass[] = [0, 4, 8, 1, 5, 9, 2, 6, 10, 3, 7, 11]
 
 const SIZE   = 240
