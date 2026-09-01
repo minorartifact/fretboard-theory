@@ -7,6 +7,7 @@ import { useProgressionStore } from '../../store/progression'
 import { ALL_INTERVALS } from '../../theory/intervals'
 import { SEMITONE_TO_INTERVAL } from '../../theory/constants'
 import { getPitchName } from '../../theory/pitch'
+import type { LabelMode } from '../../theory/types'
 
 const SEG_BTN: React.CSSProperties = {
   display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
@@ -57,6 +58,14 @@ const MODES: { id: FretboardMode; label: string; hint: string }[] = [
   { id: 'intervals', label: 'Intervals', hint: 'Pick intervals below · tap any fret to move the anchor' },
 ]
 
+// Mirrors LabelModeToggle in the header. The header is gone in fullscreen, so
+// the toolbar carries the same three choices there rather than stranding them.
+const LABEL_MODES: { id: LabelMode; label: string }[] = [
+  { id: 'note',     label: 'Note' },
+  { id: 'degree',   label: 'Degree' },
+  { id: 'interval', label: 'Interval' },
+]
+
 interface Props {
   onHearScale: () => void
 }
@@ -73,6 +82,8 @@ export function FretboardToolbar({ onHearScale }: Props) {
 
   const fullscreen       = useViewStore(s => s.fullscreen)
   const toggleFullscreen = useViewStore(s => s.toggleFullscreen)
+  const labelMode        = useViewStore(s => s.labelMode)
+  const setLabelMode     = useViewStore(s => s.setLabelMode)
   const root             = useTheoryStore(s => s.root)
   const hasScale         = useTheoryStore(s => s.scale !== null)
   const fretCount        = useFretboardStore(s => s.fretCount)
@@ -103,7 +114,7 @@ export function FretboardToolbar({ onHearScale }: Props) {
 
   return (
     <div data-tour="modes" style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
         <span style={GROUP_LABEL}>Mode</span>
         <div style={SEGMENTED}>
           {MODES.map(m => {
@@ -136,6 +147,23 @@ export function FretboardToolbar({ onHearScale }: Props) {
             </button>
           ))}
         </div>
+
+        {fullscreen && (
+          <>
+            <span style={GROUP_LABEL}>Labels</span>
+            <div style={SEGMENTED}>
+              {LABEL_MODES.map(l => (
+                <button
+                  key={l.id}
+                  onClick={() => setLabelMode(l.id)}
+                  style={labelMode === l.id ? { ...SEG_BTN, background: '#2c241c', color: '#f1ebe2' } : SEG_BTN}
+                >
+                  {l.label}
+                </button>
+              ))}
+            </div>
+          </>
+        )}
 
         <button
           onClick={onHearScale}
