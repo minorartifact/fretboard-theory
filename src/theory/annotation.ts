@@ -1,13 +1,16 @@
 import type { FretboardNote, NoteAnnotation, NoteRole, AnnotationContext } from './types'
-import { getPitchName, getPitchNameForDegree, intervalBetween } from './pitch'
+import { getPitchName, spellInScale, spellChordTone, intervalBetween } from './pitch'
 import { isInScale, getScaleDegreeLabel } from './scales'
 import { isInChord, getChordToneRole, getChordToneLabel } from './chords'
 import { SEMITONE_TO_DEGREE, SEMITONE_TO_INTERVAL } from './constants'
 
 export function annotateNote(note: FretboardNote, ctx: AnnotationContext): NoteAnnotation {
   const { root, scale, chord, labelMode, spelling } = ctx
+  const auto       = spelling === 'auto'
   let semitones    = intervalBetween(root, note.pitchClass)
-  let pitchName    = getPitchName(note.pitchClass, spelling, root)
+  let pitchName    = auto
+    ? spellInScale(note.pitchClass, root, scale)
+    : getPitchName(note.pitchClass, spelling, root)
   let role: NoteRole
   let degreeLabel    = SEMITONE_TO_DEGREE[semitones]
   let highlighted: boolean
@@ -16,12 +19,11 @@ export function annotateNote(note: FretboardNote, ctx: AnnotationContext): NoteA
     semitones   = intervalBetween(chord.root, note.pitchClass)
     role        = getChordToneRole(note.pitchClass, chord) ?? 'chord-tone'
     degreeLabel = getChordToneLabel(note.pitchClass, chord) ?? degreeLabel
-    if (spelling === 'auto') pitchName = getPitchNameForDegree(note.pitchClass, chord.root, degreeLabel)
+    if (auto) pitchName = spellChordTone(note.pitchClass, degreeLabel, chord.root, root, scale)
     highlighted = true
   } else if (scale && isInScale(note.pitchClass, root, scale)) {
     role        = 'scale-degree'
     degreeLabel = getScaleDegreeLabel(note.pitchClass, root, scale) ?? degreeLabel
-    if (spelling === 'auto') pitchName = getPitchNameForDegree(note.pitchClass, root, degreeLabel)
     highlighted = true
   } else if (scale) {
     role        = 'chromatic'

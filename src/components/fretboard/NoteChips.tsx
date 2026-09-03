@@ -2,7 +2,7 @@ import { useMemo } from 'react'
 import { useTheoryStore } from '../../store/theory'
 import { useInteractiveStore } from '../../store/interactive'
 import { useProgressionStore, useDisplayedStep } from '../../store/progression'
-import { getPitchName } from '../../theory/pitch'
+import { spellInScale } from '../../theory/pitch'
 import { CHORD_QUALITIES_BY_ID } from '../../theory/chords'
 import { resolveProgression } from '../../theory/progression'
 import { degreeFill, degreeTextColor } from './colors'
@@ -47,7 +47,7 @@ export function NoteChips() {
       {scale.pattern.map((semitones, i) => {
         const pc       = ((root + semitones) % 12) as PitchClass
         const degLabel = scale.degrees[i]
-        const noteName = getPitchName(pc, 'auto', root)
+        const noteName = spellInScale(pc, root, scale)
 
         let chipColor = degreeFill(degLabel)
         let opacity   = 1

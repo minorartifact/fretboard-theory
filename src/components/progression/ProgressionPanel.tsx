@@ -4,7 +4,7 @@ import { useProgressionStore, COMMON_PROGRESSIONS } from '../../store/progressio
 import { useViewStore } from '../../store/view'
 import { getDiatonicChords, getSecondaryDominant } from '../../theory/chords'
 import { resolveProgression } from '../../theory/progression'
-import { getPitchName } from '../../theory/pitch'
+import { spellInScale } from '../../theory/pitch'
 import { degreeFillFor } from '../fretboard/colors'
 import { ProgressionCards } from './ProgressionCards'
 import { NewSlotCard } from './NewSlotCard'
@@ -163,7 +163,7 @@ export function ProgressionPanel() {
               {diatonic.map((chord, i) => {
                 const deg      = i + 1
                 const fill     = degreeFillFor(deg)
-                const rootName = getPitchName(chord.root, 'auto', root)
+                const rootName = spellInScale(chord.root, root, scale)
                 const numeral  = romanNumeral(i, chord.quality)
                 const isActive = activeStep != null && steps[activeStep]?.degree === deg && steps[activeStep]?.secondaryDominantOf == null
 
@@ -205,7 +205,7 @@ export function ProgressionPanel() {
                   const targetChord = diatonic[targetDegIdx]
                   if (!targetChord) return null
                   const secDom    = getSecondaryDominant(targetChord.root)
-                  const secName   = getPitchName(secDom.root, 'auto', root)
+                  const secName   = spellInScale(secDom.root, root, scale)
                   const fill      = degreeFillFor(targetDeg)
                   const targetRn  = ROMAN[targetDegIdx] ?? `${targetDeg}`
                   const isActive  = activeStep != null && steps[activeStep]?.secondaryDominantOf === targetDeg
@@ -214,7 +214,7 @@ export function ProgressionPanel() {
                     <button
                       key={targetDeg}
                       onClick={() => handleSecDomTap(targetDeg, targetDegIdx)}
-                      title={`${secName}7 → resolves to ${getPitchName(targetChord.root, 'auto', root)} (V/${targetRn})`}
+                      title={`${secName}7 → resolves to ${spellInScale(targetChord.root, root, scale)} (V/${targetRn})`}
                       className={!isActive ? 'h-chord' : ''}
                       style={{
                         display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '3px',
@@ -400,7 +400,7 @@ export function ProgressionPanel() {
                 const numeral  = targetRn != null
                   ? `V/${targetRn}`
                   : (chord ? romanNumeral(deg - 1, chord.quality) : ROMAN[deg - 1] ?? `${deg}`)
-                const noteName = chord ? getPitchName(chord.root, 'auto', root) : ''
+                const noteName = chord ? spellInScale(chord.root, root, scale) : ''
                 const qualSym  = chord?.quality.symbol ?? ''
                 const tipLabel = chord ? `${noteName}${chord.quality.name}` : ''
 

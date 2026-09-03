@@ -19,7 +19,7 @@ import { useTheoryStore } from './store/theory'
 import { useProgressionStore, useDisplayedStep } from './store/progression'
 import { useViewStore } from './store/view'
 import { useInteractiveStore } from './store/interactive'
-import { getPitchName } from './theory/pitch'
+import { spellRoot, spellInScale } from './theory/pitch'
 import { CHORD_QUALITIES_BY_ID } from './theory/chords'
 import { resolveProgression } from './theory/progression'
 
@@ -31,7 +31,7 @@ function MainHeader({ narrow }: { narrow: boolean }) {
   const progSteps      = useProgressionStore(s => s.steps)
   const step           = useDisplayedStep()
 
-  const rootName = getPitchName(root, 'auto', root)
+  const rootName = spellRoot(root, scale)
 
   // Derive active chord name — progression takes precedence
   const chordName = useMemo(() => {
@@ -39,7 +39,7 @@ function MainHeader({ narrow }: { narrow: boolean }) {
       try {
         const resolved = resolveProgression(root, scale, { steps: progSteps })
         const c = resolved[step]
-        if (c) return getPitchName(c.root, 'auto', c.root) + c.quality.symbol
+        if (c) return spellInScale(c.root, root, scale) + c.quality.symbol
       } catch { /* resolveProgression can throw for non-diatonic scales */ }
     }
     if (chordQualityId) {

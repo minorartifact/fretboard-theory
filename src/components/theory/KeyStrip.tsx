@@ -1,5 +1,6 @@
 import { useTheoryStore } from '../../store/theory'
 import { SHARP_NAMES } from '../../theory/constants'
+import { spellRoot } from '../../theory/pitch'
 import type { PitchClass } from '../../theory/types'
 
 /**
@@ -10,6 +11,7 @@ import type { PitchClass } from '../../theory/types'
  */
 export function KeyStrip() {
   const root    = useTheoryStore(s => s.root)
+  const scale   = useTheoryStore(s => s.scale)
   const setRoot = useTheoryStore(s => s.setRoot)
 
   return (
@@ -18,13 +20,17 @@ export function KeyStrip() {
       aria-label="Key"
       style={{ display: 'flex', gap: '3px', marginTop: '12px', flexWrap: 'wrap' }}
     >
-      {SHARP_NAMES.map((name, pc) => {
+      {SHARP_NAMES.map((sharpName, pc) => {
         const active   = pc === root
-        const isSharp  = name.includes('#')
-        const label    = name.replace('#', '♯')
+        // Labelled from the table, the button offered a D♯ that every other
+        // surface then called E♭ — one key under two names, one of them
+        // unclickable. It has to say what the key will be called.
+        const name     = spellRoot(pc as PitchClass, scale)
+        const isSharp  = sharpName.includes('#')
+        const label    = name.replace('#', '♯').replace('b', '♭')
         return (
           <button
-            key={name}
+            key={pc}
             onClick={() => setRoot(pc as PitchClass)}
             aria-pressed={active}
             title={`Key of ${label}`}

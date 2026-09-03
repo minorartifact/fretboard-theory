@@ -4,8 +4,7 @@ import { useTheoryStore } from '../../store/theory'
 import { chooseChordQuality } from '../../store/selection'
 import { SCALES } from '../../theory/scales'
 import { CHORD_QUALITIES, getChordNotes } from '../../theory/chords'
-import { SHARP_NAMES } from '../../theory/constants'
-import { getPitchName, getPitchNameForDegree } from '../../theory/pitch'
+import { spellRoot, spellChordTones } from '../../theory/pitch'
 import type { PitchClass } from '../../theory/types'
 
 /**
@@ -50,8 +49,8 @@ export function CommandPalette() {
 
   const items: Item[] = useMemo(() => {
     if (kind === 'tonic') {
-      return SHARP_NAMES.map((_, pc) => {
-        const name = getPitchName(pc as PitchClass, 'auto', pc as PitchClass)
+      return Array.from({ length: 12 }, (_, pc) => {
+        const name = spellRoot(pc as PitchClass, scale)
         return {
           id: `pc-${pc}`,
           label: name.replace('#', '♯').replace('b', '♭'),
@@ -72,6 +71,7 @@ export function CommandPalette() {
         choose: () => setScale(s),
       }))
     }
+    const rootName = spellRoot(root, scale)
     return [
       {
         id: '__none', label: 'No chord quality', meta: 'Show the scale on its own',
@@ -80,12 +80,10 @@ export function CommandPalette() {
       ...CHORD_QUALITIES.map(q => ({
         id: q.id,
         label: q.name,
-        meta: q.symbol ? `${getPitchName(root, 'auto', root)}${q.symbol}` : getPitchName(root, 'auto', root),
+        meta: `${rootName}${q.symbol}`,
         // Spell each note against the degree it plays, or a diminished fifth
         // comes out as D# rather than Eb — wrong in a theory app.
-        notes: getChordNotes({ root, quality: q })
-          .map((pc, i) => getPitchNameForDegree(pc, root, q.degreeLabels[i]))
-          .join(' '),
+        notes: spellChordTones(getChordNotes({ root, quality: q }), q.degreeLabels, root, root, scale).join(' '),
         hint: q.degreeLabels.join(' '),
         current: chordQualityId === q.id,
         choose: () => setQuality(q.id),

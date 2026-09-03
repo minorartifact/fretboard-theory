@@ -2,7 +2,7 @@ import { useMemo } from 'react'
 import { useTheoryStore } from '../../store/theory'
 import { useProgressionStore } from '../../store/progression'
 import { resolveProgression } from '../../theory/progression'
-import { getPitchName } from '../../theory/pitch'
+import { spellInScale } from '../../theory/pitch'
 import { degreeFillFor } from '../fretboard/colors'
 import { ROMAN, romanNumeral } from './romanNumeral'
 import { SaveSongForm } from './SaveSongForm'
@@ -131,7 +131,7 @@ export function ProgressionCards({ handleStepClick }: Props) {
           const numeral  = targetRn != null
             ? `V/${targetRn}`
             : (chord ? romanNumeral(deg - 1, chord.quality) : ROMAN[deg - 1] ?? `${deg}`)
-          const noteName = chord ? getPitchName(chord.root, 'auto', root) : ''
+          const noteName = chord ? spellInScale(chord.root, root, scale) : ''
           const qualSym  = chord?.quality.symbol ?? ''
 
           return (

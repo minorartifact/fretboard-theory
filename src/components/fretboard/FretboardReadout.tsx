@@ -1,11 +1,11 @@
 import { useInteractiveStore, type PinnedNote } from '../../store/interactive'
 import { useTheoryStore } from '../../store/theory'
 import { useFretboardStore } from '../../store/fretboard'
-import { getPitchName } from '../../theory/pitch'
+import { spellRoot, spellInScale } from '../../theory/pitch'
 import { detectInterval, detectChord, INTERVAL_NAMES } from '../../theory/identify'
 import { intervalPitchClasses } from '../../theory/intervals'
 import { Keycap } from '../ui/Keycap'
-import type { PitchClass, Tuning } from '../../theory/types'
+import type { PitchClass, ScaleDef, Tuning } from '../../theory/types'
 
 function countNeckPositions(pc: number, tuning: Tuning, fretCount: number): number {
   let n = 0
@@ -22,7 +22,7 @@ const SECTION_LABEL: React.CSSProperties = {
   textTransform: 'uppercase', color: '#6b6258', flexShrink: 0,
 }
 
-function NoteChip({ note, root }: { note: PinnedNote; root: PitchClass }) {
+function NoteChip({ note, root, scale }: { note: PinnedNote; root: PitchClass; scale: ScaleDef | null }) {
   return (
     <span style={{
       display: 'inline-flex', alignItems: 'center',
@@ -31,7 +31,7 @@ function NoteChip({ note, root }: { note: PinnedNote; root: PitchClass }) {
       color: '#ede6dd', fontFamily: "'JetBrains Mono', monospace",
       fontWeight: 700, fontSize: '14px',
     }}>
-      {getPitchName(note.pc, 'auto', root)}
+      {spellInScale(note.pc, root, scale)}
     </span>
   )
 }
@@ -79,7 +79,7 @@ export function FretboardReadout() {
 
   if (intervalMode) {
     const anchorPc   = anchor?.pc ?? root
-    const anchorName = getPitchName(anchorPc, 'auto', root)
+    const anchorName = spellInScale(anchorPc, root, scale)
     const litCount   = [...intervalPitchClasses(anchorPc, selectedIntervals)]
       .reduce<number>((n, pc) => n + countNeckPositions(pc, tuning, fretCount), 0)
 
@@ -109,7 +109,7 @@ export function FretboardReadout() {
   // Explore mode with chips/number keys active — say what is lit.
   if (exploreMode && selectedIntervals.length > 0) {
     const pcs      = [...intervalPitchClasses(root, selectedIntervals)]
-    const names    = pcs.map(pc => getPitchName(pc, 'auto', root)).join(' · ')
+    const names    = pcs.map(pc => spellInScale(pc, root, scale)).join(' · ')
     const litCount = pcs.reduce<number>((n, pc) => n + countNeckPositions(pc, tuning, fretCount), 0)
 
     return row(<>
@@ -142,11 +142,11 @@ export function FretboardReadout() {
     const shownPc: PitchClass = hoverPc ?? root
     const hovering  = hoverPc != null
     const count     = countNeckPositions(shownPc, tuning, fretCount)
-    const noteName  = getPitchName(shownPc, 'auto', root)
+    const noteName  = spellInScale(shownPc, root, scale)
     const offset    = ((shownPc - root) + 12) % 12
     const scaleIdx  = scale ? scale.pattern.indexOf(offset) : -1
     const degLabel  = scaleIdx >= 0 && scale ? scale.degrees[scaleIdx] : null
-    const rootName  = getPitchName(root, 'auto', root)
+    const rootName  = spellRoot(root, scale)
 
     const detail = offset === 0
       ? `the tonic · every ${noteName} on the neck`
@@ -199,7 +199,7 @@ export function FretboardReadout() {
   } else {
     const chord = detectChord(pinned.map(p => p.pc))
     if (chord) {
-      const rootName = getPitchName(chord.root, 'auto', root)
+      const rootName = spellInScale(chord.root, root, scale)
       result = (
         <div style={{ display: 'flex', alignItems: 'baseline', gap: '12px' }}>
           <span style={{ fontSize: '28px', fontWeight: 800, color: '#e0a85a', fontFamily: "'JetBrains Mono', monospace" }}>
@@ -223,7 +223,7 @@ export function FretboardReadout() {
     <span style={SECTION_LABEL}>Identify</span>
     {pinned.length > 0 && (
       <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
-        {pinned.map((p, i) => <NoteChip key={i} note={p} root={root} />)}
+        {pinned.map((p, i) => <NoteChip key={i} note={p} root={root} scale={scale} />)}
       </div>
     )}
     {result}

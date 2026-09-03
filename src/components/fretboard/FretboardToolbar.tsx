@@ -6,10 +6,9 @@ import { supportsVoicings } from '../../theory/chordVoicings'
 import { useProgressionStore } from '../../store/progression'
 import { ALL_INTERVALS } from '../../theory/intervals'
 import { stringSets, INVERSIONS, type Inversion } from '../../theory/triads'
-import { getPitchName as pitchName } from '../../theory/pitch'
+import { spellInScale, spellRoot } from '../../theory/pitch'
 import type { PitchClass } from '../../theory/types'
 import { SEMITONE_TO_INTERVAL } from '../../theory/constants'
-import { getPitchName } from '../../theory/pitch'
 import type { LabelMode } from '../../theory/types'
 
 const SEG_BTN: React.CSSProperties = {
@@ -100,7 +99,8 @@ export function FretboardToolbar({ onHearScale }: Props) {
   const labelMode        = useViewStore(s => s.labelMode)
   const setLabelMode     = useViewStore(s => s.setLabelMode)
   const root             = useTheoryStore(s => s.root)
-  const hasScale         = useTheoryStore(s => s.scale !== null)
+  const scale            = useTheoryStore(s => s.scale)
+  const hasScale         = scale !== null
   const fretCount        = useFretboardStore(s => s.fretCount)
   const tuning           = useFretboardStore(s => s.tuning)
 
@@ -123,12 +123,12 @@ export function FretboardToolbar({ onHearScale }: Props) {
 
   const triadSets  = stringSets(tuning)
   const setLabel   = (i: number) => triadSets[i].strings
-    .map(st => pitchName((tuning.openNotes[st] % 12) as PitchClass, 'auto', root))
+    .map(st => spellInScale((tuning.openNotes[st] % 12) as PitchClass, root, scale))
     .reverse()
     .join('-')
 
   const anchorPc   = anchor?.pc ?? root
-  const anchorName = getPitchName(anchorPc, 'auto', root)
+  const anchorName = spellInScale(anchorPc, root, scale)
   const activeMode = MODES.find(m => m.id === mode)
   const hint       = mode === 'chords' && chordShape === 'triads'
     ? 'Each colour is one inversion · the same chord in three places on one string set'
@@ -232,7 +232,7 @@ export function FretboardToolbar({ onHearScale }: Props) {
           </span>
         ) : usingDefaultChord ? (
           <span>
-            — showing <strong style={{ color: '#6cd8e8', fontWeight: 700 }}>{getPitchName(root, 'auto', root)} major</strong>, the default.
+            — showing <strong style={{ color: '#6cd8e8', fontWeight: 700 }}>{spellRoot(root, scale)} major</strong>, the default.
             Pick a chord quality in the sidebar, or a step in your progression, to see another. Notes outside the chord are dimmed.
           </span>
         ) : (
